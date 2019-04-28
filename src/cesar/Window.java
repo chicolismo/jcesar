@@ -20,6 +20,7 @@ public class Window extends JFrame {
 	private Controller controller;
 	private SidePanel programPanel;
 	private SidePanel dataPanel;
+	private DisplayPanel display;
 	private RegisterPanel[] registers;
 
 	public Window() {
@@ -85,6 +86,11 @@ public class Window extends JFrame {
 		dataPanel.getTable().setModel(dataModel);
 		dataPanel.setSize(dataPanel.getPreferredSize());
 		dataPanel.setVisible(true);
+		
+		display = new DisplayPanel(this, "Mostrador");
+		display.setSize(display.getPreferredSize());
+		display.setVisible(true);
+		display.setValue("Fuck you!!!");
 	}
 
 	public void updatePositions() {
@@ -114,6 +120,7 @@ public class Window extends JFrame {
 				Point p = event.getPoint();
 				registers[0].setValue(p.x);
 				registers[1].setValue(p.y);
+				display.setValue(p.toString());
 			}
 		});
 	}
