@@ -1,4 +1,4 @@
-package cesar;
+package cesar.table;
 
 import javax.swing.table.AbstractTableModel;
 

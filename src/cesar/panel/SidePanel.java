@@ -1,7 +1,7 @@
-package cesar;
+package cesar.panel;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -17,22 +17,18 @@ public class SidePanel extends JDialog {
 	private JPanel panel;
 	private JLabel label;
 	private JTextField textField;
-	private GridBagConstraints c_1;
 
-	public SidePanel(JFrame parent, String title) {
-		super(parent, title);
+	public SidePanel(JFrame parent, String title, JTable table) {
+		super(parent, title, Dialog.ModalityType.MODELESS);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		panel = new JPanel();
 		setContentPane(panel);
 		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		// TODO: Mudar a fonte da tabela!
-		table = new JTable();
-		table.setDoubleBuffered(true);
-		table.setColumnSelectionAllowed(false);
-		JScrollPane scrollPane = new JScrollPane();
+		this.table = table;
+		JScrollPane scrollPane = new JScrollPane(this.table);
 		scrollPane.setDoubleBuffered(true);
-		scrollPane.setViewportView(table);
+		this.table.setFillsViewportHeight(true);
 
 		label = new JLabel("0");
 		textField = new JTextField(10);
@@ -41,37 +37,36 @@ public class SidePanel extends JDialog {
 		textField.setMinimumSize(dim);
 		textField.setMaximumSize(dim);
 		textField.setPreferredSize(dim);
+
 		JPanel innerPanel = new JPanel();
-		var layout = new FlowLayout(FlowLayout.RIGHT);
-		//innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
-		innerPanel.setLayout(layout);
+		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
 		innerPanel.add(label);
 		innerPanel.add(textField);
 
 		GridBagLayout grid = new GridBagLayout();
-		grid.columnWidths = new int[]{0};
-		grid.rowHeights = new int[]{0, 0};
-		grid.columnWeights = new double[]{1.0};
-		grid.rowWeights = new double[]{1.0, 0.0};
+		grid.columnWidths = new int[] { 0 };
+		grid.rowHeights = new int[] { 0, 0 };
+		grid.columnWeights = new double[] { 1.0 };
+		grid.rowWeights = new double[] { 1.0, 0.0 };
 		panel.setLayout(grid);
-		
-		GridBagConstraints c = new GridBagConstraints();
+
+		GridBagConstraints c;
+
+		c = new GridBagConstraints();
 		c.insets = new Insets(0, 0, 5, 0);
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.gridy = 0;
 		panel.add(scrollPane, c);
-		
-		c_1 = new GridBagConstraints();
-		c_1.anchor = GridBagConstraints.EAST;
-		c_1.fill = GridBagConstraints.VERTICAL;
-		c_1.gridx = 0;
-		c_1.gridy = 1;
-		panel.add(innerPanel, c_1);
-		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
-		
+
+		c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.EAST;
+		c.fill = GridBagConstraints.VERTICAL;
+		c.gridx = 0;
+		c.gridy = 1;
+		panel.add(innerPanel, c);
 	}
-	
+
 	public JTable getTable() {
 		return table;
 	}

@@ -1,4 +1,4 @@
-package cesar;
+package cesar.table;
 
 public class ProgramTableModel extends TableModel {
 	private static final long serialVersionUID = -7167972103457974892L;

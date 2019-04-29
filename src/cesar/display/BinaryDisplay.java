@@ -1,4 +1,4 @@
-package cesar;
+package cesar.display;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -25,8 +25,8 @@ public class BinaryDisplay extends JPanel {
 	static {
 		displayImages = new BufferedImage[2];
 		try {
-			displayImages[0] = ImageIO.read(BinaryDisplay.class.getResourceAsStream("icons/mini_led_0.png"));
-			displayImages[1] = ImageIO.read(BinaryDisplay.class.getResourceAsStream("icons/mini_led_1.png"));
+			displayImages[0] = ImageIO.read(BinaryDisplay.class.getResourceAsStream("../images/icons/mini_led_0.png"));
+			displayImages[1] = ImageIO.read(BinaryDisplay.class.getResourceAsStream("../images/icons/mini_led_1.png"));
 		}
 		catch (IOException e) {
 			e.printStackTrace();

@@ -4,20 +4,23 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-public class ApplicationMenu extends JMenuBar {
+public class Menu extends JMenuBar {
 	private static final long serialVersionUID = -687929457632692467L;
 
 	private Window parent;
 
-	public ApplicationMenu(Window parent) {
+	public Menu(Window parent) {
 		this.parent = parent;
 		initFileMenu();
 	}
 
 	private void initFileMenu() {
-		var controller = parent.getController();
+		var controller = parent; //parent.getController();
 
 		var fileMenu = new JMenu("Arquivo");
+		var editMenu = new JMenu("Editar");
+		var viewMenu = new JMenu("Visualizar");
+		var helpMenu = new JMenu("?");
 
 		var menuItemOpenFile = new JMenuItem("Abrir...");
 		menuItemOpenFile.addActionListener(event -> controller.openFile());
@@ -38,5 +41,8 @@ public class ApplicationMenu extends JMenuBar {
 		fileMenu.add(menuItemExit);
 
 		this.add(fileMenu);
+		this.add(editMenu);
+		this.add(viewMenu);
+		this.add(helpMenu);
 	}
 }

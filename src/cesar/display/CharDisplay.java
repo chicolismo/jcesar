@@ -1,4 +1,4 @@
-package cesar;
+package cesar.display;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,18 +20,20 @@ public class CharDisplay extends JPanel {
 	private static final int CHAR_OFFSET = CHAR_WIDTH + 1;
 	private static final int WIDTH = CHAR_OFFSET * SIZE + 1;
 	private static final int HEIGHT = CHAR_HEIGHT + 8;
+	private static final int NUMBER_OF_CHARACTERS = 95;
 
 	private static final BufferedImage[] charImages;
 	private char[] value;
 
 	static {
-		charImages = new BufferedImage[95];
-		String format = "tiles/character_%02d.png";
+		charImages = new BufferedImage[NUMBER_OF_CHARACTERS];
+		String format = "../images/characters/character_%02d.png";
 		try {
-			for (int i = 0; i < 95; ++i) {
+			for (int i = 0; i < NUMBER_OF_CHARACTERS; ++i) {
 				charImages[i] = ImageIO.read(CharDisplay.class.getResourceAsStream(String.format(format, i)));
 			}
 		} catch (IOException e) {
+			System.err.println("Erro ao tentar ler as imagens dos caracteres.");
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -51,7 +53,12 @@ public class CharDisplay extends JPanel {
 	}
 
 	public void setValueAt(int index, char value) {
-		this.value[index] = value;
+		if (value >= 32 && value <= 126) {
+			this.value[index] = value;
+		}
+		else {
+			this.value[index] = ' ';
+		}
 	}
 
 	public void setValue(String string) {
@@ -59,7 +66,7 @@ public class CharDisplay extends JPanel {
 		int size = Math.min(newValue.length, SIZE);
 		int i;
 		for (i = 0; i < size; ++i) {
-			value[i] = newValue[i];
+			setValueAt(i, newValue[i]);
 		}
 		while (i < SIZE) {
 			value[i] = ' ';
