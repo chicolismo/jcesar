@@ -1,15 +1,11 @@
 package cesar.display;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
 
 public class DigitalDisplay extends JPanel {
 	public static final long serialVersionUID = -527728462654031001L;

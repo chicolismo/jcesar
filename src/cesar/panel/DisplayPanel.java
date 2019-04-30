@@ -1,15 +1,12 @@
 package cesar.panel;
 
-import java.awt.Point;
+import cesar.display.CharDisplay;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
-
-import cesar.display.CharDisplay;
 
 public class DisplayPanel extends JDialog {
 	private static final long serialVersionUID = -4447642329893150278L;

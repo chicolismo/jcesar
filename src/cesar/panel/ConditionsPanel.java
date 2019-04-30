@@ -1,10 +1,9 @@
 package cesar.panel;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-
 import cesar.display.LedDisplay;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 public class ConditionsPanel extends JPanel {
 	private static final long serialVersionUID = -7989953222534549887L;

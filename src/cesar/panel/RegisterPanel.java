@@ -1,16 +1,13 @@
 package cesar.panel;
 
-import java.awt.Dimension;
+import cesar.display.BinaryDisplay;
+import cesar.display.DigitalDisplay;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-
-import cesar.display.BinaryDisplay;
-import cesar.display.DigitalDisplay;
+import java.awt.*;
 
 public class RegisterPanel extends JPanel {
 	private static final long serialVersionUID = 2138122907978072925L;

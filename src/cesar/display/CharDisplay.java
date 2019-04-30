@@ -1,13 +1,10 @@
 package cesar.display;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.JPanel;
 
 public class CharDisplay extends JPanel {
 	private static final long serialVersionUID = 4304849380002674639L;

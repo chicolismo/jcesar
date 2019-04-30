@@ -1,37 +1,46 @@
 package cesar.panel;
 
-import java.awt.FlowLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
+class ButtonsPanel extends JPanel {
+    private static final long serialVersionUID = 5342775832156361567L;
 
-public class ButtonsPanel extends JPanel {
-	private static final long serialVersionUID = 5342775832156361567L;
+    private JButton btnDecimal;
+    private JButton btnHexadecimal;
 
-	JToggleButton btnDecimal;
-	JToggleButton btnHexadecimal;
+    ButtonsPanel() {
+        super(true);
+        //var layout = new FlowLayout(FlowLayout.CENTER, 0, 0);
+        var layout = new BoxLayout(this, BoxLayout.X_AXIS);
+        setLayout(layout);
 
-	public ButtonsPanel() {
-		super(true);
-		var layout = new FlowLayout(FlowLayout.CENTER, 0, 0);
-		setLayout(layout);
+        btnDecimal = new JButton("0..9");
+        btnDecimal.setMargin(new Insets(0, 0, 0, 0));
+        btnDecimal.putClientProperty("JButton.buttonType", "segmented");
+        btnDecimal.putClientProperty("JButton.segmentPosition", "first");
+        btnDecimal.putClientProperty("JComponent.sizeVariant", "small");
+        btnDecimal.setFocusPainted(false);
 
-		btnDecimal = new JToggleButton("0..9");
-		btnDecimal.setMargin(new Insets(0, 0, 0, 0));
+        btnHexadecimal = new JButton("0..F");
+        btnHexadecimal.setMargin(new Insets(0, 0, 0, 0));
+        btnHexadecimal.putClientProperty("JButton.buttonType", "segmented");
+        btnHexadecimal.putClientProperty("JButton.segmentPosition", "last");
+        btnHexadecimal.putClientProperty("JComponent.sizeVariant", "small");
+        btnHexadecimal.setFocusPainted(false);
 
-		btnHexadecimal = new JToggleButton("0..F");
-		btnHexadecimal.setMargin(new Insets(0, 0, 0, 0));
+        btnDecimal.addActionListener((event) -> {
+            btnDecimal.setSelected(true);
+            btnHexadecimal.setSelected(false);
+        });
 
-		btnDecimal.addActionListener((event) -> {
-			btnHexadecimal.setSelected(!btnDecimal.isSelected());
-		});
+        btnHexadecimal.addActionListener((event) -> {
+            btnHexadecimal.setSelected(true);
+            btnDecimal.setSelected(false);
+        });
 
-		btnHexadecimal.addActionListener((event) -> {
-			btnDecimal.setSelected(!btnHexadecimal.isSelected());
-		});
-
-		add(btnDecimal);
-		add(btnHexadecimal);
-	}
+        add(btnDecimal);
+        //add(Box.createRigidArea(new Dimension(0, 0)));
+        add(btnHexadecimal);
+    }
 }

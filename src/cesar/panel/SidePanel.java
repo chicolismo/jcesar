@@ -1,24 +1,21 @@
 package cesar.panel;
 
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import cesar.table.Table;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import java.awt.Insets;
+import javax.swing.event.ListSelectionEvent;
+import java.awt.*;
 
 public class SidePanel extends JDialog {
 	private static final long serialVersionUID = -5287184935159813862L;
 
-	private JTable table;
+	private Table table;
 	private JPanel panel;
 	private JLabel label;
 	private JTextField textField;
 
-	public SidePanel(JFrame parent, String title, JTable table) {
+	public SidePanel(JFrame parent, String title, Table table) {
 		super(parent, title, Dialog.ModalityType.MODELESS);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		panel = new JPanel();
@@ -32,6 +29,7 @@ public class SidePanel extends JDialog {
 
 		label = new JLabel("0");
 		textField = new JTextField(10);
+		textField.setHorizontalAlignment(JTextField.RIGHT);
 		var dim = new Dimension(100, 20);
 		textField.setSize(dim);
 		textField.setMinimumSize(dim);
@@ -65,9 +63,24 @@ public class SidePanel extends JDialog {
 		c.gridx = 0;
 		c.gridy = 1;
 		panel.add(innerPanel, c);
+
+		initEvents();
 	}
 
 	public JTable getTable() {
 		return table;
+	}
+
+	private void initEvents() {
+		ListSelectionModel selectionModel = table.getSelectionModel();
+		selectionModel.addListSelectionListener((ListSelectionEvent event) -> {
+			int index = table.getSelectedRow();
+			String address = table.getAddressAtRow(index);
+			String value = table.getValueAtRow(index);
+			label.setText(address);
+			textField.setText(value);
+			textField.grabFocus();
+			textField.selectAll();
+		});
 	}
 }

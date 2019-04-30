@@ -1,20 +1,18 @@
 package cesar.panel;
 
-import java.awt.GridLayout;
+import cesar.display.DigitalDisplay;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-
-import cesar.display.DigitalDisplay;
+import java.awt.*;
 
 public class ExecutionPanel extends JPanel {
 	private static final long serialVersionUID = -4010296867969223401L;
 
-	DigitalDisplay accessDisplay;
-	DigitalDisplay instructionsDisplay;
+	private DigitalDisplay accessDisplay;
+	private DigitalDisplay instructionsDisplay;
 
 	public ExecutionPanel() {
 		super(true);

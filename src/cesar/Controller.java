@@ -1,29 +1,77 @@
 package cesar;
 
-import java.awt.event.WindowEvent;
+import cesar.panel.DisplayPanel;
+import cesar.panel.SidePanel;
+import cesar.table.DataTable;
+import cesar.table.ProgramTable;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
 
 public class Controller {
 	
-	JFrame window;
-	
-	public Controller(JFrame window) {
-		this.window = window;
+	private Window parent;
+	private JFileChooser fileChooser;
+	private SidePanel programPanel;
+	private SidePanel dataPanel;
+	private DisplayPanel displayPanel;
+	private MenuBar menuBar;
+	private CPU cpu;
+
+	public Controller(Window parent, SidePanel programPanel, SidePanel dataPanel, DisplayPanel displayPanel, MenuBar menuBar) {
+		this.parent = parent;
+		this.programPanel = programPanel;
+		this.dataPanel = dataPanel;
+		this.displayPanel = displayPanel;
+		this.menuBar = menuBar;
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Arquivos de memória", "mem");
+		fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(filter);
+
+		cpu = new CPU();
+		cpu.setDataTable((DataTable) dataPanel.getTable());
+		cpu.setProgramTable((ProgramTable) programPanel.getTable());
+		cpu.setDisplayPanel(displayPanel);
+		initMenuBarEvents();
 	}
 
-	public void openFile() {
-		JOptionPane.showMessageDialog(this.window, "Hello, world");
+	private void openFile() {
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			try {
+				FileInputStream inputStream = new FileInputStream(file);
+				int size = (int) file.length();
+				byte[] buffer = new byte[size];
+				inputStream.readNBytes(buffer, 0, size);
+				cpu.setBytes(buffer);
+				inputStream.close();
+			} catch (java.io.IOException e) {
+				String message = String.format("Erro ao tentar ler o arquivo %s.", file.getPath());
+				JOptionPane.showMessageDialog(parent, message, "Erro de leitura", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void initMenuBarEvents() {
+        menuBar.getMenuItemOpenFile().addActionListener(event -> this.openFile());
+        menuBar.getMenuItemSaveFile().addActionListener(event -> this.saveFile());
+		menuBar.getMenuItemSaveFileAs().addActionListener(event -> this.saveFileAs());
+        menuBar.getMenuItemExit().addActionListener(event -> this.exit());
 	}
 	
-	public void saveFile() {
+	private void saveFile() {
 		
 	}
 	
-	public void saveFileAs() {
+	private void saveFileAs() {
 		
 	}
 	
-	public void exit() {
-		window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+	private void exit() {
+		parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
 	}
 }
