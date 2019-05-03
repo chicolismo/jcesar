@@ -11,14 +11,13 @@ public class SidePanel extends JDialog {
 	private static final long serialVersionUID = -5287184935159813862L;
 
 	private Table table;
-	private JPanel panel;
 	private JLabel label;
 	private JTextField textField;
 
 	public SidePanel(JFrame parent, String title, Table table) {
 		super(parent, title, Dialog.ModalityType.MODELESS);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		panel = new JPanel();
+		JPanel panel = new JPanel();
 		setContentPane(panel);
 		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -28,16 +27,11 @@ public class SidePanel extends JDialog {
 		this.table.setFillsViewportHeight(true);
 
 		label = new JLabel("0");
-		textField = new JTextField(10);
+		textField = new JTextField("", 10);
 		textField.setHorizontalAlignment(JTextField.RIGHT);
-		var dim = new Dimension(100, 20);
-		textField.setSize(dim);
-		textField.setMinimumSize(dim);
-		textField.setMaximumSize(dim);
-		textField.setPreferredSize(dim);
 
 		JPanel innerPanel = new JPanel();
-		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
+		innerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
 		innerPanel.add(label);
 		innerPanel.add(textField);
 
@@ -59,7 +53,7 @@ public class SidePanel extends JDialog {
 
 		c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.EAST;
-		c.fill = GridBagConstraints.VERTICAL;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 1;
 		panel.add(innerPanel, c);

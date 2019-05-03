@@ -1,16 +1,26 @@
 package cesar;
 
-import cesar.panel.*;
+import cesar.panel.ConditionsPanel;
+import cesar.panel.DisplayPanel;
+import cesar.panel.ExecutionPanel;
+import cesar.panel.MainPanel;
+import cesar.panel.RegisterPanel;
+import cesar.panel.SidePanel;
 import cesar.table.DataTable;
 import cesar.table.ProgramTable;
 import cesar.table.Table;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.Dialog.ModalExclusionType;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -55,7 +65,7 @@ class Window extends JFrame {
         this.dataPanel = dataPanel;
         this.registers = mainPanel.getRegisters();
         this.displayPanel = displayPanel;
-        MenuBar menuBar = new MenuBar();
+        MenuBar menuBar = new MenuBar(this);
         this.setJMenuBar(menuBar);
 
         this.controller = new Controller(this, programPanel, dataPanel, displayPanel, menuBar);
