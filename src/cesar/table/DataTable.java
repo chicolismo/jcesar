@@ -6,7 +6,7 @@ import javax.swing.table.TableColumnModel;
 public class DataTable extends Table {
 	private static final long serialVersionUID = -3030887157789883813L;
 
-	private static final Class[] COLUMN_CLASSES = new Class[] { Integer.class, Integer.class };
+	private static final Class<?>[] COLUMN_CLASSES = new Class[] { Integer.class, Integer.class };
 
 	private static class DataTableModel extends Table.TableModel {
 		private static final long serialVersionUID = -1657410804127435495L;
@@ -42,7 +42,7 @@ public class DataTable extends Table {
 	}
 
 	@Override
-	public Class getColumnClass(int column) {
+	public Class<?> getColumnClass(int column) {
 		return COLUMN_CLASSES[column];
 	}
 

@@ -6,7 +6,7 @@ import javax.swing.table.TableColumnModel;
 public class ProgramTable extends Table {
 	private static final long serialVersionUID = 2477981247131807536L;
 
-	private static final Class[] COLUMN_CLASSES = new Class[] { String.class, Integer.class, Integer.class, String.class };
+	private static final Class<?>[] COLUMN_CLASSES = new Class[] { String.class, Integer.class, Integer.class, String.class };
 
 	private static class ProgramTableModel extends Table.TableModel {
 		private static final long serialVersionUID = -7167972103457974892L;
@@ -51,7 +51,7 @@ public class ProgramTable extends Table {
 	}
 
 	@Override
-	public Class getColumnClass(int column) {
+	public Class<?> getColumnClass(int column) {
 		return COLUMN_CLASSES[column];
 	}
 

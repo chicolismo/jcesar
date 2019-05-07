@@ -4,9 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainPanel extends JPanel {
-    private RegisterPanel[] registers;
+	private static final long serialVersionUID = -8181221815362621489L;
+
+	private RegisterPanel[] registers;
     private ExecutionPanel executionPanel;
     private ConditionsPanel conditionsPanel;
+    private ButtonPanel buttonPanel;
 
     public MainPanel()  {
         super(true);
@@ -61,14 +64,13 @@ public class MainPanel extends JPanel {
         c.gridy = 0;
         middlePanel.add(conditionsPanel, c);
 
-        //JPanel buttonsPanel = new JPanel();
-        ButtonsPanel buttonsPanel = new ButtonsPanel();
+        this.buttonPanel = new ButtonPanel();
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.SOUTH;
         c.gridx = 1;
         c.gridy = 1;
-        middlePanel.add(buttonsPanel, c);
+        middlePanel.add(this.buttonPanel, c);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(registerPanel);
@@ -85,5 +87,9 @@ public class MainPanel extends JPanel {
 
     public RegisterPanel[] getRegisters() {
         return registers;
+    }
+
+    public ButtonPanel getButtonPanel() {
+        return buttonPanel;
     }
 }

@@ -17,6 +17,7 @@ public class SidePanel extends JDialog {
 	public SidePanel(JFrame parent, String title, Table table) {
 		super(parent, title, Dialog.ModalityType.MODELESS);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
 		JPanel panel = new JPanel();
 		setContentPane(panel);
 		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -76,5 +77,9 @@ public class SidePanel extends JDialog {
 			textField.grabFocus();
 			textField.selectAll();
 		});
+	}
+	
+	public void setDecimal(boolean isDecimal) {
+		// TODO: Notificar as tabelas e os inputs.
 	}
 }
