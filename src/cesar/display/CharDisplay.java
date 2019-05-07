@@ -71,6 +71,10 @@ public class CharDisplay extends JPanel {
 		}
 	}
 
+    public int length() {
+        return SIZE;
+    }
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

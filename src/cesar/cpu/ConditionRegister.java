@@ -1,6 +1,7 @@
 package cesar.cpu;
 
 public class ConditionRegister {
+    /*
     private int register;
 
     public ConditionRegister(int initialValue) {
@@ -29,6 +30,87 @@ public class ConditionRegister {
 
     public boolean isCarry() {
         return (register & 0b0001) > 0;
+    }
+    */
+
+    private boolean negative;
+    private boolean zero;
+    private boolean overflow;
+    private boolean carry;
+
+    public ConditionRegister() {
+        negative = false;
+        zero = false;
+        overflow = false;
+        carry = false;
+    }
+
+    public void setConditions(byte code) {
+        if ((code & 8) > 0) {
+            setNegative(true);
+        }
+
+        if ((code & 4) > 0) {
+            setZero(true);
+        }
+
+        if ((code & 2) > 0) {
+            setOverflow(true);
+        }
+
+        if ((code & 1) > 0) {
+            setCarry(true);
+        }
+    }
+
+    public void clearConditions(byte code) {
+        if ((code & 8) > 0) {
+            setNegative(false);
+        }
+
+        if ((code & 4) > 0) {
+            setZero(false);
+        }
+
+        if ((code & 2) > 0) {
+            setOverflow(false);
+        }
+
+        if ((code & 1) > 0) {
+            setCarry(false);
+        }
+    }
+
+    public boolean isNegative() {
+        return negative;
+    }
+
+    public void setNegative(boolean condition) {
+        negative = condition;
+    }
+
+    public boolean isZero() {
+        return zero;
+    }
+
+    public void setZero(boolean condition) {
+        zero = condition;
+    }
+
+    public boolean isOverflow() {
+        return overflow;
+    }
+
+    public void setOverflow(boolean condition) {
+        overflow = condition;
+    }
+
+    public boolean isCarry() {
+        return carry;
+    }
+
+    public void setCarry(boolean condition) {
+        carry = condition;
     }
 
     public boolean shouldJump(int conditionCode) {

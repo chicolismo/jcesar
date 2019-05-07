@@ -41,6 +41,7 @@ public class Controller {
     }
 
     private void openFile() {
+        parent.toFront();
         if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             try (FileInputStream inputStream = new FileInputStream(file)) {
@@ -57,7 +58,7 @@ public class Controller {
     }
 
     private void initMenuBarEvents() {
-        menuBar.getMenuItemOpenFile().addActionListener(event -> this.openFile());
+        menuBar.getMenuItemLoadFile().addActionListener(event -> this.openFile());
         menuBar.getMenuItemSaveFile().addActionListener(event -> this.saveFile());
         menuBar.getMenuItemSaveFileAs().addActionListener(event -> this.saveFileAs());
         menuBar.getMenuItemExit().addActionListener(event -> this.exit());

@@ -23,6 +23,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 class Window extends JFrame {
     private static final long serialVersionUID = 7470189528132411359L;
@@ -48,6 +50,7 @@ class Window extends JFrame {
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
         setContentPane(contentPane);
+        //var contentPane = getContentPane();
 
         MainPanel mainPanel = new MainPanel();
         contentPane.add(mainPanel);
@@ -79,6 +82,9 @@ class Window extends JFrame {
         this.programPanel.setVisible(true);
         this.dataPanel.setVisible(true);
         this.displayPanel.setVisible(true);
+        programPanel.setSize(350, 500);
+        dataPanel.setSize(160, 500);
+        dataPanel.getTable().scrollToRow(1024);
         setResizable(false);
     }
 
@@ -94,9 +100,11 @@ class Window extends JFrame {
         programPanel.setLocation(location.x - programPanel.getWidth() - spacing, location.y);
         dataPanel.setLocation(location.x + getWidth() + spacing, location.y);
 
+        /*
         int height = getHeight();
         programPanel.setSize(programPanel.getWidth(), height);
         dataPanel.setSize(dataPanel.getWidth(), height);
+         */
     }
 
     private void center() {
@@ -114,7 +122,6 @@ class Window extends JFrame {
             }
         });
 
-        /*
         getContentPane().addMouseMotionListener(new MouseAdapter() {
             public void mouseMoved(MouseEvent event) {
                 Point p = event.getPoint();
@@ -125,7 +132,6 @@ class Window extends JFrame {
                 displayPanel.setValue(p.toString());
             }
         });
-        */
     }
 
     public Controller getController() {

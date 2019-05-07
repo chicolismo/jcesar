@@ -19,8 +19,6 @@ public class CPU {
     }
 
     private static final AddressMode[] ADDRESS_MODES = AddressMode.values();
-    private static final int DISPLAY_START_ADDRESS = 65500;
-    private static final int DISPLAY_END_ADDRESS = 65535;
 
     private ProgramTable programTable;
     private DataTable dataTable;
@@ -30,10 +28,10 @@ public class CPU {
     private final short[] registers;
     private final ConditionRegister conditionRegister;
 
-    CPU() {
+    public CPU() {
         memory = new Memory();
         registers = new short[8];
-        conditionRegister = new ConditionRegister(0b0000);
+        conditionRegister = new ConditionRegister();
     }
 
     public void setProgramTable(ProgramTable programTable) {
@@ -46,10 +44,6 @@ public class CPU {
 
     public void setDisplayPanel(DisplayPanel displayPanel) {
         this.displayPanel = displayPanel;
-    }
-
-    private short concatBytesToWord(byte a, byte b) {
-        return (short) (((0xFF & a) << 8) | (0xFF & b));
     }
 
     private void incrementRegister(int registerNumber, int amount) {
@@ -77,7 +71,7 @@ public class CPU {
     private void updateTables() {
         final int memorySize = memory.size();
         for (int i = 0; i < memorySize; ++i) {
-            final int value = UnsignedBytes.toInt(memory.read(i));
+            final int value = UnsignedBytes.toInt(memory.readByte(i));
             programTable.setValueAt(value, i, 2);
             dataTable.setValueAt(value, i, 1);
         }
@@ -86,15 +80,23 @@ public class CPU {
     }
 
     private void updateDisplay() {
-        for (int counter = DISPLAY_START_ADDRESS, i = 0; counter <= DISPLAY_END_ADDRESS; ++counter, ++i) {
-            displayPanel.setValueAt(i, (char) memory.read(counter));
-        }
+        displayPanel.setValue(memory.getDisplayBytes());
         displayPanel.repaint();
     }
 
-    void executeNextInstruction() {
-        byte firstByte = memory.read(registers[7]);
+    /**
+     * Lê o byte cujo endereço está no R7.
+     * Incrementa o R7 em 1.
+     * @return byte da memória cujo endereço se encontra atualmente no PC.
+     */
+    private byte fetchByte() {
+        byte value = memory.readByte(registers[7]);
         incrementRegister(7, 1);
+        return value;
+    }
+
+    void executeNextInstruction() {
+        byte firstByte = fetchByte();
 
         // Copia os 4 bits mais significativos
         int opCode = 0x0F & (firstByte >> 4);
@@ -112,18 +114,17 @@ public class CPU {
                 break;
 
             case 0b0011: { /* Desvio condicional */
-                byte secondByte = memory.read(registers[7]);
-                incrementRegister(7, 1);
-                conditionalBranch(firstByte, secondByte);
+                byte secondByte = fetchByte();
+                executeConditionalBranch(firstByte, secondByte);
+                break;
             }
-            break;
 
             case 0b0100: { /* Desvio incondicional (JMP) */
-                byte secondByte = memory.read(registers[7]);
-                short word = concatBytesToWord(firstByte, secondByte);
+                byte secondByte = fetchByte();
+                short word = UnsignedShorts.bytesToShort(firstByte, secondByte);
                 jmp(word);
+                break;
             }
-            break;
 
             case 0b0101: /* Instrução de controle de laço (SOB)*/
                 break;
@@ -134,8 +135,12 @@ public class CPU {
             case 0b0111: /* Instrução de retorno de sub-rotina (RTS) */
                 break;
 
-            case 0b1000: /* Instruções de 1 operando */
+            case 0b1000: { /* Instruções de 1 operando */
+                byte secondByte = fetchByte();
+                executeOneOperandInstruction(firstByte, secondByte);
+                // TODO: Continuar
                 break;
+            }
 
             case 0b1001: /* MOV */
                 break;
@@ -163,6 +168,17 @@ public class CPU {
         // Verifica se a interface deve ser atualizada com os novos valores dos
         // registradores e códigos de condição.  Bem como se as tabelas devem ser
         // alteradas.
+    }
+
+    private void executeOneOperandInstruction(byte firstByte, byte secondByte) {
+        // 0b1000_CCCC
+        int code = 0x0F & firstByte;
+
+        // 0bXXMM_MRRR
+        int addressMode = (0b0011_1000 & secondByte) >> 3;
+        int registerNumber = 0b0000_0111 & secondByte;
+
+        // TODO: Onde enfiar o operando???
     }
 
     /**
@@ -224,38 +240,32 @@ public class CPU {
                 break;
 
             case INDEXED: {
-                byte firstByte = memory.read(registers[7]);
-                incrementRegister(7, 1);
-                byte secondByte = memory.read(registers[7]);
-                incrementRegister(7, 1);
-                short word = concatBytesToWord(firstByte, secondByte);
+                short word = memory.readWord(registers[7]);
+                incrementRegister(7, 2);
                 operand = (short) (registers[reg] + word);
+                break;
             }
-            break;
 
             case REGISTER_INDIRECT:
-                operand = memory.read(registers[reg]);
+                operand = memory.readWord(registers[reg]);
                 break;
 
             case POST_INCREMENTED_INDIRECT:
-                operand = memory.read(registers[reg]);
+                operand = memory.readWord(registers[reg]);
                 incrementRegister(reg, 2);
                 break;
 
             case PRE_DECREMENTED_INDIRECT:
                 decrementRegister(reg, 2);
-                operand = memory.read(registers[reg]);
+                operand = memory.readWord(registers[reg]);
                 break;
 
             case INDEX_INDIRECT: {
-                byte firstByte = memory.read(registers[7]);
-                incrementRegister(7, 1);
-                byte secondByte = memory.read(registers[7]);
-                incrementRegister(7, 1);
-                short word = concatBytesToWord(firstByte, secondByte);
-                operand = memory.read((short) (registers[reg] + word));
+                short word = memory.readWord(registers[7]);
+                incrementRegister(7, 2);
+                operand = memory.readWord((short) (registers[reg] + word));
+                break;
             }
-            break;
         }
 
         return operand;
@@ -267,7 +277,7 @@ public class CPU {
      * @param instructionByte O byte que contém o código de condição nos 4 bits menos significativos.
      * @param offsetByte      O byte que contém o deslocamento a ser somado de R7.
      */
-    private void conditionalBranch(byte instructionByte, byte offsetByte) {
+    private void executeConditionalBranch(byte instructionByte, byte offsetByte) {
         // O código do desvio condicional são so 4 bits menos significativos do firstByte
         int code = 0x0F & instructionByte;
 

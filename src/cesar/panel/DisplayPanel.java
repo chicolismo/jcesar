@@ -33,8 +33,15 @@ public class DisplayPanel extends JDialog {
         display.repaint();
     }
 
+    public void setValue(byte[] value) {
+        int size = Math.min(value.length, display.length());
+        for (int i = 0; i < size; ++i) {
+            display.setValueAt(i, (char) value[i]);
+        }
+    }
+
     public void setValueAt(int index, char value) {
-        // TODO: Garantir que "index" está dentro do intervalo
+        // TODO: Garantir que "index" está dentro do intervalo!!
         display.setValueAt(index, value);
     }
 

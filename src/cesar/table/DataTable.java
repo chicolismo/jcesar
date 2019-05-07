@@ -6,6 +6,8 @@ import javax.swing.table.TableColumnModel;
 public class DataTable extends Table {
 	private static final long serialVersionUID = -3030887157789883813L;
 
+	private static final Class[] COLUMN_CLASSES = new Class[] { Integer.class, Integer.class };
+
 	private static class DataTableModel extends Table.TableModel {
 		private static final long serialVersionUID = -1657410804127435495L;
 
@@ -29,10 +31,19 @@ public class DataTable extends Table {
 		// Endereço
 		column = columnModel.getColumn(0);
 		column.setCellRenderer(RIGHT_RENDERER);
+		column.setWidth(column.getPreferredWidth());
+		column.setResizable(false);
 
 		// Dados
 		column = columnModel.getColumn(1);
 		column.setCellRenderer(RIGHT_RENDERER);
+		column.setWidth(column.getPreferredWidth());
+		column.setResizable(false);
+	}
+
+	@Override
+	public Class getColumnClass(int column) {
+		return COLUMN_CLASSES[column];
 	}
 
 	@Override

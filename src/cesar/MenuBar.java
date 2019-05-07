@@ -1,13 +1,16 @@
 package cesar;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 class MenuBar extends JMenuBar {
     private static final long serialVersionUID = -687929457632692467L;
 
     private Window parent;
 
-    private JMenuItem menuItemOpenFile;
+    private JMenuItem menuItemLoadFile;
     private JMenuItem menuItemSaveFile;
     private JMenuItem menuItemSaveFileAs;
     private JMenuItem menuItemExit;
@@ -19,12 +22,24 @@ class MenuBar extends JMenuBar {
         var viewMenu = new JMenu("Visualizar");
         var helpMenu = new JMenu("?");
 
-        menuItemOpenFile = new JMenuItem("Abrir...");
-        menuItemSaveFile = new JMenuItem("Salvar");
-        menuItemSaveFileAs = new JMenuItem("Salvar como...");
-        menuItemExit = new JMenuItem("Sair");
+        fileMenu.setMnemonic('a');
+        editMenu.setMnemonic('e');
+        viewMenu.setMnemonic('v');
+        helpMenu.setMnemonic('?');
 
-        fileMenu.add(getMenuItemOpenFile());
+        menuItemLoadFile = new JMenuItem("Carregar...", KeyEvent.VK_C);
+        menuItemSaveFile = new JMenuItem("Salvar", KeyEvent.VK_S);
+        menuItemSaveFileAs = new JMenuItem("Salvar como...", KeyEvent.VK_V);
+        menuItemExit = new JMenuItem("Sair", KeyEvent.VK_R);
+
+        int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+
+        menuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, mask));
+        menuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, mask));
+        menuItemSaveFileAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, mask | InputEvent.SHIFT_DOWN_MASK));
+        menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, mask));
+
+        fileMenu.add(getMenuItemLoadFile());
         fileMenu.add(getMenuItemSaveFile());
         fileMenu.add(getMenuItemSaveFileAs());
         fileMenu.addSeparator();
@@ -36,8 +51,8 @@ class MenuBar extends JMenuBar {
         this.add(helpMenu);
     }
 
-    public JMenuItem getMenuItemOpenFile() {
-        return menuItemOpenFile;
+    public JMenuItem getMenuItemLoadFile() {
+        return menuItemLoadFile;
     }
 
     public JMenuItem getMenuItemSaveFile() {

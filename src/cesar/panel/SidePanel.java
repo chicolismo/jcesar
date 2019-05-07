@@ -61,7 +61,7 @@ public class SidePanel extends JDialog {
 		initEvents();
 	}
 
-	public JTable getTable() {
+	public Table getTable() {
 		return table;
 	}
 
