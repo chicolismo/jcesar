@@ -29,10 +29,18 @@ public class CPU {
 	private final ALU alu;
 
 	public CPU() {
-		this.memory = new Memory();
+		this.memory = new Memory(this);
 		this.registers = new short[8];
 		this.conditionRegister = new ConditionRegister();
 		this.alu = new ALU(this.conditionRegister);
+		
+		registers[1] = (short) 4;
+	}
+	
+	public void notifyMemoryChange(int index, byte value) {
+		Integer unsignedByte = UnsignedShorts.toInt(value);
+		programTable.setValueAtAndUpdate(unsignedByte, index, 2);
+		dataTable.setValueAtAndUpdate(unsignedByte, index, 1);
 	}
 
 	public short[] getRegisters() {
@@ -187,10 +195,10 @@ public class CPU {
 		int code = 0x0F & firstByte;
 
 		// 0bXXMM_MRRR
-		int addressMode = (0b0011_1000 & secondByte) >> 3;
-		int registerNumber = 0b0000_0111 & secondByte;
+		int addressMode = (0b0011_1000 & secondByte) >> 3; // Modo de endereçamento
+		int reg = 0b0000_0111 & secondByte; // O número do registrador
 
-		short operand = getOperand(addressMode, registerNumber);
+		short operand = getOperand(addressMode, reg);
 		// TODO: Onde enfiar o operando???
 		switch (code) {
 		case 0: /* CLR: op <- 0 */
@@ -228,6 +236,29 @@ public class CPU {
 			break;
 		case 11: /* SBC: op <- op - c */
 			operand = alu.sbc(operand);
+			break;
+		}
+
+		switch (ADDRESS_MODES[addressMode]) {
+		case REGISTER:
+			registers[reg] = operand;
+			break;
+		case REGISTER_POST_INCREMENTED:
+			break;
+		case REGISTER_PRE_DECREMENTED:
+			break;
+		case INDEXED:
+			break;
+		case REGISTER_INDIRECT:
+			memory.writeWord(registers[reg], operand);
+			break;
+		case POST_INCREMENTED_INDIRECT:
+			break;
+		case PRE_DECREMENTED_INDIRECT:
+			break;
+		case INDEX_INDIRECT:
+			break;
+		default:
 			break;
 		}
 	}

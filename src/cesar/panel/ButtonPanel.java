@@ -1,7 +1,5 @@
 package cesar.panel;
 
-
-import java.awt.FlowLayout;
 import java.awt.Insets;
 
 import javax.imageio.ImageIO;
@@ -30,34 +28,31 @@ public class ButtonPanel extends JPanel {
 
 	ButtonPanel() {
 		super(true);
-		//var layout = new FlowLayout(FlowLayout.CENTER, 0, 0);
 		var layout = new BoxLayout(this, BoxLayout.X_AXIS);
 		setLayout(layout);
-		
+
 		setBorder(new EmptyBorder(3, 3, 3, 3));
 
 		btnDecimal = new JToggleButton("0..9");
-		//btnDecimal.putClientProperty("JButton.buttonType", "gradient");
-		//btnDecimal.putClientProperty("JButton.buttonType", "segmented");
-		//btnDecimal.putClientProperty("JButton.segmentPosition", "first");
+		btnDecimal.putClientProperty("JButton.buttonType", "square");
+		btnDecimal.putClientProperty("JComponent.sizeVariant", "small");
 		btnDecimal.setMargin(new Insets(2, 2, 2, 2));
 		btnDecimal.setFocusPainted(false);
 
 		btnHexadecimal = new JToggleButton("0..F");
-		//btnHexadecimal.putClientProperty("JButton.buttonType", "gradient");
-		//btnHexadecimal.putClientProperty("JButton.buttonType", "segmented");
-		//btnHexadecimal.putClientProperty("JButton.segmentPosition", "last");
+		btnHexadecimal.putClientProperty("JButton.buttonType", "square");
+		btnHexadecimal.putClientProperty("JComponent.sizeVariant", "small");
 		btnHexadecimal.setMargin(new Insets(2, 2, 2, 2));
 		btnHexadecimal.setFocusPainted(false);
 
 		btnRun = new JToggleButton();
-		//btnRun.putClientProperty("JButton.buttonType", "segmentedCapsule");
+		btnRun.putClientProperty("JButton.buttonType", "square");
 		btnRun.setMargin(new Insets(2, 2, 2, 2));
 		btnRun.setIcon(runIcon);
 		btnRun.setFocusPainted(false);
 
 		btnNext = new JButton();
-		//btnNext.putClientProperty("JButton.buttonType", "gradient");
+		btnNext.putClientProperty("JButton.buttonType", "square");
 		btnNext.setMargin(new Insets(2, 2, 2, 2));
 		btnNext.setIcon(nextIcon);
 		btnNext.setFocusPainted(false);

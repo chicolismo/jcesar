@@ -4,16 +4,19 @@ import java.util.Arrays;
 
 public class Memory {
     private static final int MEMORY_SIZE = 1 << 16;
+    
+    private final CPU cpu;
     private byte[] data;
     private static final int DISPLAY_START_ADDRESS = 65500;
     private static final int DISPLAY_END_ADDRESS = 65535;
     private long bytesRead;
     private long bytesWritten;
-
-    public Memory() {
-        data = new byte[MEMORY_SIZE];
-        bytesRead = 0;
-        bytesWritten = 0;
+    
+    public Memory(CPU cpu) {
+    	this.cpu = cpu;
+        this.data = new byte[MEMORY_SIZE];
+        this.bytesRead = 0;
+        this.bytesWritten = 0;
     }
 
     public int size() {
@@ -52,7 +55,14 @@ public class Memory {
 
     public void writeByte(short address, byte value) {
         ++bytesWritten;
-        data[UnsignedShorts.toInt(address)] = value;
+        int index = UnsignedShorts.toInt(address);
+        data[index] = value;
+        cpu.notifyMemoryChange(index, value);
+    }
+    
+    public void writeWord(short address, short value) {
+    	writeByte(address, (byte) (0xFF00 & value));
+    	writeByte((short) (address + 1), (byte) (0x00FF & value));
     }
 
     public byte[] getDisplayBytes() {

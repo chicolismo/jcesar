@@ -1,24 +1,14 @@
 package cesar.table;
 
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class ProgramTable extends Table {
 	private static final long serialVersionUID = 2477981247131807536L;
 
-	private static final Class<?>[] COLUMN_CLASSES = new Class[] { String.class, Integer.class, Integer.class, String.class };
-
-	private static class ProgramTableModel extends Table.TableModel {
-		private static final long serialVersionUID = -7167972103457974892L;
-
-		ProgramTableModel() {
-			columnNames = new String[] { "PC", "Endereço", "Dados", "Mnemônico" };
-			data = new Object[MEMORY_SIZE][4];
-			for (int i = 0; i < MEMORY_SIZE; ++i) {
-				data[i] = new Object[] { "", i, 0, "" };
-			}
-		}
-	}
+	private static final Class<?>[] COLUMN_CLASSES = new Class[] { String.class, Integer.class, Integer.class,
+			String.class };
 
 	public ProgramTable() {
 		super();
@@ -31,23 +21,32 @@ public class ProgramTable extends Table {
 		column = columnModel.getColumn(0);
 		column.setMaxWidth(34);
 		column.setWidth(column.getPreferredWidth());
-		column.setCellRenderer(CENTER_RENDERER);
 		column.setResizable(false);
 
 		// Endereço
 		column = columnModel.getColumn(1);
 		column.setMaxWidth(70);
 		column.setWidth(column.getPreferredWidth());
-		column.setCellRenderer(RIGHT_RENDERER);
 		column.setResizable(false);
 
 		// Dado
 		column = columnModel.getColumn(2);
 		column.setMaxWidth(70);
 		column.setWidth(column.getPreferredWidth());
-		column.setCellRenderer(RIGHT_RENDERER);
 		column.setResizable(false);
+	}
 
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int col) {
+		switch (col) {
+		case 0:
+			return getCenteredRenderer();
+		case 1:
+		case 2:
+			return isDecimal() ? getDecimalRenderer() : getHexadecimalRenderer();
+		default:
+			return getDefaultRenderer();
+		}
 	}
 
 	@Override
@@ -63,5 +62,17 @@ public class ProgramTable extends Table {
 	@Override
 	public String getValueAtRow(int row) {
 		return String.valueOf(getValueAt(row, 2));
+	}
+
+	private static class ProgramTableModel extends Table.TableModel {
+		private static final long serialVersionUID = -7167972103457974892L;
+
+		ProgramTableModel() {
+			columnNames = new String[] { "PC", "Endereço", "Dados", "Mnemônico" };
+			data = new Object[MEMORY_SIZE][4];
+			for (int i = 0; i < MEMORY_SIZE; ++i) {
+				data[i] = new Object[] { "", i, 0, "" };
+			}
+		}
 	}
 }

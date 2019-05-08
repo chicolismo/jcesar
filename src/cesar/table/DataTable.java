@@ -1,5 +1,6 @@
 package cesar.table;
 
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -7,19 +8,6 @@ public class DataTable extends Table {
 	private static final long serialVersionUID = -3030887157789883813L;
 
 	private static final Class<?>[] COLUMN_CLASSES = new Class[] { Integer.class, Integer.class };
-
-	private static class DataTableModel extends Table.TableModel {
-		private static final long serialVersionUID = -1657410804127435495L;
-
-		DataTableModel() {
-			this.columnNames = new String[] { "Endereço", "Dado" };
-			this.data = new Object[MEMORY_SIZE][2];
-
-			for (int i = 0; i < MEMORY_SIZE; ++i) {
-				this.data[i] = new Object[] { i, 0 };
-			}
-		}
-	}
 
 	public DataTable() {
 		super();
@@ -30,15 +18,18 @@ public class DataTable extends Table {
 
 		// Endereço
 		column = columnModel.getColumn(0);
-		column.setCellRenderer(RIGHT_RENDERER);
 		column.setWidth(column.getPreferredWidth());
 		column.setResizable(false);
 
 		// Dados
 		column = columnModel.getColumn(1);
-		column.setCellRenderer(RIGHT_RENDERER);
 		column.setWidth(column.getPreferredWidth());
 		column.setResizable(false);
+	}
+	
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int col) {
+		return isDecimal() ? getDecimalRenderer() : getHexadecimalRenderer();
 	}
 
 	@Override
@@ -56,4 +47,16 @@ public class DataTable extends Table {
 		return String.valueOf(getValueAt(row, 1));
 	}
 
+	private static class DataTableModel extends Table.TableModel {
+		private static final long serialVersionUID = -1657410804127435495L;
+
+		DataTableModel() {
+			this.columnNames = new String[] { "Endereço", "Dado" };
+			this.data = new Object[MEMORY_SIZE][2];
+
+			for (int i = 0; i < MEMORY_SIZE; ++i) {
+				this.data[i] = new Object[] { i, 0 };
+			}
+		}
+	}
 }

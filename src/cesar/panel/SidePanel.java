@@ -80,6 +80,7 @@ public class SidePanel extends JDialog {
 	}
 	
 	public void setDecimal(boolean isDecimal) {
+		table.setDecimal(isDecimal);
 		// TODO: Notificar as tabelas e os inputs.
 	}
 }

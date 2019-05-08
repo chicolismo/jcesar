@@ -1,103 +1,154 @@
 package cesar.table;
 
-import javax.swing.*;
+import java.awt.Font;
+import java.awt.Rectangle;
+
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-import java.awt.*;
 
 public abstract class Table extends JTable {
-    private static final long serialVersionUID = 5510916208167787328L;
+	private static final long serialVersionUID = 5510916208167787328L;
 
-    static final DefaultTableCellRenderer RIGHT_RENDERER;
-    static final DefaultTableCellRenderer CENTER_RENDERER;
+	private boolean isDecimal;
+	private final TableCellRenderer centeredRenderer;
+	private final TableCellRenderer hexadecimalRenderer;
+	private final TableCellRenderer decimalRenderer;
+	private final TableCellRenderer defaultRenderer;
 
-    static {
-        RIGHT_RENDERER = new DefaultTableCellRenderer();
-        RIGHT_RENDERER.setHorizontalAlignment(JLabel.RIGHT);
-        CENTER_RENDERER = new DefaultTableCellRenderer();
-        CENTER_RENDERER.setHorizontalAlignment(JLabel.RIGHT);
-    }
+	Table() {
+		defaultRenderer = new DefaultTableCellRenderer();
+		centeredRenderer = new CenteredTableCellRenderer();
+		decimalRenderer = new DecimalRenderer();
+		hexadecimalRenderer = new HexadecimalRenderer();
+		isDecimal = true;
 
-    static class HeaderRenderer implements TableCellRenderer {
-        private DefaultTableCellRenderer renderer;
+		setDoubleBuffered(true);
+		setColumnSelectionAllowed(false);
 
-        public HeaderRenderer(JTable table) {
-            renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
-            renderer.setHorizontalAlignment(JLabel.CENTER);
-        }
+		JTableHeader header = getTableHeader();
+		header.setDefaultRenderer(new CenteredTableCellRenderer());
+		header.setReorderingAllowed(false);
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
-            return renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        }
-    }
+		getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    Table() {
-        setDoubleBuffered(true);
+		setFont(new Font("monospaced", Font.PLAIN, 12));
+	}
 
-        JTableHeader header = getTableHeader();
-        header.setDefaultRenderer(new HeaderRenderer(this));
+	public void setDecimal(boolean isDecimal) {
+		if (this.isDecimal != isDecimal) {
+			this.isDecimal = isDecimal;
+			((TableModel) getModel()).fireTableDataChanged();
+		}
+	}
 
-        // Disabilita arrastar as colunas
-        header.setReorderingAllowed(false);
+	protected TableCellRenderer getDefaultRenderer() {
+		return defaultRenderer;
+	}
 
-        setColumnSelectionAllowed(false);
+	protected TableCellRenderer getDecimalRenderer() {
+		return decimalRenderer;
+	}
 
-        ListSelectionModel selectionModel = getSelectionModel();
-        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	protected TableCellRenderer getHexadecimalRenderer() {
+		return hexadecimalRenderer;
+	}
 
-        setFont(new Font("monospaced", Font.PLAIN, 12));
-    }
+	protected TableCellRenderer getCenteredRenderer() {
+		return centeredRenderer;
+	}
 
-    public void scrollToRow(int rowNumber) {
-        int rowHeight = getRowHeight();
-        int parentHeight = getParent().getHeight();
-        var rect = new Rectangle(0, (rowNumber - 1) * rowHeight + parentHeight, getWidth(), rowHeight);
-        scrollRectToVisible(rect);
-    }
+	protected boolean isDecimal() {
+		return isDecimal;
+	}
 
-    public abstract String getAddressAtRow(int row);
+	public void scrollToRow(int rowNumber) {
+		int rowHeight = getRowHeight();
+		int parentHeight = getParent().getHeight();
+		var rect = new Rectangle(0, (rowNumber - 1) * rowHeight + parentHeight, getWidth(), rowHeight);
+		scrollRectToVisible(rect);
+	}
 
-    public abstract String getValueAtRow(int row);
+	public abstract String getAddressAtRow(int row);
 
-    protected static abstract class TableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 8671470346716518079L;
+	public abstract String getValueAtRow(int row);
 
-        static final int MEMORY_SIZE = 1 << 16;
-        String[] columnNames;
-        Object[][] data;
+	public void setValueAtAndUpdate(Object value, int row, int col) {
+		((TableModel) getModel()).setValueAtAndUpdate(value, row, col);
+	}
 
-        @Override
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
+	protected static abstract class TableModel extends AbstractTableModel {
+		private static final long serialVersionUID = 8671470346716518079L;
 
-        @Override
-        public int getRowCount() {
-            return data.length;
-        }
+		static final int MEMORY_SIZE = 1 << 16;
+		String[] columnNames;
+		Object[][] data;
 
-        @Override
-        public int getColumnCount() {
-            return columnNames.length;
-        }
+		@Override
+		public String getColumnName(int col) {
+			return columnNames[col];
+		}
 
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            return data[rowIndex][columnIndex];
-        }
+		@Override
+		public int getRowCount() {
+			return data.length;
+		}
 
-        @Override
-        public void setValueAt(Object value, int row, int col) {
-            data[row][col] = value;
-        }
+		@Override
+		public int getColumnCount() {
+			return columnNames.length;
+		}
 
-        public void setValueAtAndUpdate(Object value, int row, int col) {
-            setValueAt(value, row, col);
-            fireTableCellUpdated(row, col);
-        }
-    }
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return data[rowIndex][columnIndex];
+		}
+
+		@Override
+		public void setValueAt(Object value, int row, int col) {
+			data[row][col] = value;
+		}
+
+		public void setValueAtAndUpdate(Object value, int row, int col) {
+			setValueAt(value, row, col);
+			fireTableCellUpdated(row, col);
+		}
+	}
+
+	protected class CenteredTableCellRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 5810811798031094957L;
+
+		public CenteredTableCellRenderer() {
+			super();
+			setHorizontalAlignment(JLabel.CENTER);
+		}
+	}
+
+	protected class DecimalRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = -8860753344065220474L;
+
+		public DecimalRenderer() {
+			super();
+			setHorizontalAlignment(JLabel.RIGHT);
+		}
+	}
+
+	protected class HexadecimalRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 5810811798031094957L;
+
+		public HexadecimalRenderer() {
+			super();
+			setHorizontalAlignment(JLabel.RIGHT);
+		}
+
+		@Override
+		public void setValue(Object value) {
+			setText(Integer.toHexString((Integer) value));
+		}
+	}
+
 }
