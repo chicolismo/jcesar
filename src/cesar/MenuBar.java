@@ -8,15 +8,12 @@ import java.awt.event.KeyEvent;
 class MenuBar extends JMenuBar {
     private static final long serialVersionUID = -687929457632692467L;
 
-    private Window parent;
-
     private JMenuItem menuItemLoadFile;
     private JMenuItem menuItemSaveFile;
     private JMenuItem menuItemSaveFileAs;
     private JMenuItem menuItemExit;
 
     MenuBar(Window parent) {
-        this.parent = parent;
         var fileMenu = new JMenu("Arquivo");
         var editMenu = new JMenu("Editar");
         var viewMenu = new JMenu("Visualizar");

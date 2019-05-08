@@ -323,6 +323,11 @@ public class CPU {
 			break;
 		}
 	}
+	
+	
+	/*
+	 * TODO: Transferir todas as operações para a ALU
+	 */
 
 	/**
 	 * Liga os códigos de condição contidos nos 4 bits menos significativos da
