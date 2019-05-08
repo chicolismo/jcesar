@@ -7,7 +7,7 @@ import javax.swing.table.TableColumnModel;
 public class ProgramTable extends Table {
 	private static final long serialVersionUID = 2477981247131807536L;
 
-	private static final Class<?>[] COLUMN_CLASSES = new Class[] { String.class, Integer.class, Integer.class,
+	private static final Class<?>[] COLUMN_CLASSES = new Class[] { String.class, Short.class, Byte.class,
 			String.class };
 
 	public ProgramTable() {
@@ -42,8 +42,9 @@ public class ProgramTable extends Table {
 		case 0:
 			return getCenteredRenderer();
 		case 1:
+			return isDecimal() ? getDecimalShortRenderer() : getHexadecimalShortRenderer();
 		case 2:
-			return isDecimal() ? getDecimalRenderer() : getHexadecimalRenderer();
+			return isDecimal() ? getDecimalByteRenderer() : getHexadecimalByteRenderer();
 		default:
 			return getDefaultRenderer();
 		}
@@ -71,7 +72,7 @@ public class ProgramTable extends Table {
 			columnNames = new String[] { "PC", "Endereço", "Dados", "Mnemônico" };
 			data = new Object[MEMORY_SIZE][4];
 			for (int i = 0; i < MEMORY_SIZE; ++i) {
-				data[i] = new Object[] { "", i, 0, "" };
+				data[i] = new Object[] { "", (short) i, (byte) 0, "" };
 			}
 		}
 	}

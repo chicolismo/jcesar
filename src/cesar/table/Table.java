@@ -16,15 +16,19 @@ public abstract class Table extends JTable {
 
 	private boolean isDecimal;
 	private final TableCellRenderer centeredRenderer;
-	private final TableCellRenderer hexadecimalRenderer;
-	private final TableCellRenderer decimalRenderer;
+	private final TableCellRenderer hexadecimalByteRenderer;
+	private final TableCellRenderer decimalByteRenderer;
+	private final TableCellRenderer hexadecimalShortRenderer;
+	private final TableCellRenderer decimalShortRenderer;
 	private final TableCellRenderer defaultRenderer;
 
 	Table() {
 		defaultRenderer = new DefaultTableCellRenderer();
 		centeredRenderer = new CenteredTableCellRenderer();
-		decimalRenderer = new DecimalRenderer();
-		hexadecimalRenderer = new HexadecimalRenderer();
+		decimalByteRenderer = new DecimalByteRenderer();
+		hexadecimalByteRenderer = new HexadecimalByteRenderer();
+		decimalShortRenderer = new DecimalShortRenderer();
+		hexadecimalShortRenderer = new HexadecimalShortRenderer();
 		isDecimal = true;
 
 		setDoubleBuffered(true);
@@ -38,7 +42,13 @@ public abstract class Table extends JTable {
 
 		setFont(new Font("monospaced", Font.PLAIN, 12));
 	}
-
+	
+	@Override
+	public void setValueAt(Object value, int row, int col) {
+		assert getColumnClass(col).isInstance(value);
+		super.setValueAt(value, row, col);
+	}
+	
 	public void setDecimal(boolean isDecimal) {
 		if (this.isDecimal != isDecimal) {
 			this.isDecimal = isDecimal;
@@ -50,12 +60,20 @@ public abstract class Table extends JTable {
 		return defaultRenderer;
 	}
 
-	protected TableCellRenderer getDecimalRenderer() {
-		return decimalRenderer;
+	protected TableCellRenderer getDecimalByteRenderer() {
+		return decimalByteRenderer;
 	}
 
-	protected TableCellRenderer getHexadecimalRenderer() {
-		return hexadecimalRenderer;
+	protected TableCellRenderer getHexadecimalByteRenderer() {
+		return hexadecimalByteRenderer;
+	}
+
+	protected TableCellRenderer getDecimalShortRenderer() {
+		return decimalShortRenderer;
+	}
+
+	protected TableCellRenderer getHexadecimalShortRenderer() {
+		return hexadecimalShortRenderer;
 	}
 
 	protected TableCellRenderer getCenteredRenderer() {
@@ -72,6 +90,9 @@ public abstract class Table extends JTable {
 		var rect = new Rectangle(0, (rowNumber - 1) * rowHeight + parentHeight, getWidth(), rowHeight);
 		scrollRectToVisible(rect);
 	}
+	
+	@Override
+	public abstract Class<?> getColumnClass(int col);
 
 	public abstract String getAddressAtRow(int row);
 
@@ -128,27 +149,63 @@ public abstract class Table extends JTable {
 		}
 	}
 
-	protected class DecimalRenderer extends DefaultTableCellRenderer {
+	protected class DecimalByteRenderer extends DefaultTableCellRenderer {
 		private static final long serialVersionUID = -8860753344065220474L;
 
-		public DecimalRenderer() {
-			super();
-			setHorizontalAlignment(JLabel.RIGHT);
-		}
-	}
-
-	protected class HexadecimalRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 5810811798031094957L;
-
-		public HexadecimalRenderer() {
+		public DecimalByteRenderer() {
 			super();
 			setHorizontalAlignment(JLabel.RIGHT);
 		}
 
 		@Override
 		public void setValue(Object value) {
-			setText(Integer.toHexString((Integer) value));
+			assert value instanceof Byte;
+			setText(Integer.toString(Byte.toUnsignedInt((byte) value)));
 		}
 	}
 
+	protected class HexadecimalByteRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 5810811798031094957L;
+
+		public HexadecimalByteRenderer() {
+			super();
+			setHorizontalAlignment(JLabel.RIGHT);
+		}
+
+		@Override
+		public void setValue(Object value) {
+			assert value instanceof Byte;
+			setText(Integer.toHexString(Byte.toUnsignedInt((Byte) value)));
+		}
+	}
+
+	protected class DecimalShortRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = -8860753344065220474L;
+
+		public DecimalShortRenderer() {
+			super();
+			setHorizontalAlignment(JLabel.RIGHT);
+		}
+
+		@Override
+		public void setValue(Object value) {
+			assert value instanceof Short;
+			setText(Integer.toString(Short.toUnsignedInt((short) value)));
+		}
+	}
+
+	protected class HexadecimalShortRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 5810811798031094957L;
+
+		public HexadecimalShortRenderer() {
+			super();
+			setHorizontalAlignment(JLabel.RIGHT);
+		}
+
+		@Override
+		public void setValue(Object value) {
+			assert value instanceof Short;
+			setText(Integer.toHexString(Short.toUnsignedInt((Short) value)));
+		}
+	}
 }

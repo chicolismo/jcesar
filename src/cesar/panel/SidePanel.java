@@ -4,7 +4,6 @@ import cesar.table.Table;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 
 public class SidePanel extends JDialog {
@@ -30,7 +29,7 @@ public class SidePanel extends JDialog {
 		label = new JLabel("0");
 		textField = new JTextField("", 10);
 		textField.setHorizontalAlignment(JTextField.RIGHT);
-
+		
 		JPanel innerPanel = new JPanel();
 		innerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
 		innerPanel.add(label);
@@ -68,15 +67,16 @@ public class SidePanel extends JDialog {
 
 	private void initEvents() {
 		ListSelectionModel selectionModel = table.getSelectionModel();
-		selectionModel.addListSelectionListener((ListSelectionEvent event) -> {
-			int index = table.getSelectedRow();
-			String address = table.getAddressAtRow(index);
-			String value = table.getValueAtRow(index);
-			label.setText(address);
-			textField.setText(value);
-			textField.grabFocus();
-			textField.selectAll();
-		});
+		selectionModel.addListSelectionListener(event -> updateControls(event.getLastIndex()));
+	}
+
+	private void updateControls(int rowIndex) {
+		String address = table.getAddressAtRow(rowIndex);
+		String value = table.getValueAtRow(rowIndex);
+		label.setText(address);
+		textField.setText(value);
+		textField.grabFocus();
+		textField.selectAll();
 	}
 	
 	public void setDecimal(boolean isDecimal) {

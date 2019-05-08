@@ -7,7 +7,7 @@ import javax.swing.table.TableColumnModel;
 public class DataTable extends Table {
 	private static final long serialVersionUID = -3030887157789883813L;
 
-	private static final Class<?>[] COLUMN_CLASSES = new Class[] { Integer.class, Integer.class };
+	private static final Class<?>[] COLUMN_CLASSES = new Class[] { Short.class, Byte.class };
 
 	public DataTable() {
 		super();
@@ -29,7 +29,13 @@ public class DataTable extends Table {
 	
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int col) {
-		return isDecimal() ? getDecimalRenderer() : getHexadecimalRenderer();
+		switch (col) {
+		case 0: return isDecimal() ? getDecimalShortRenderer() : getHexadecimalShortRenderer();
+		case 1: return isDecimal() ? getDecimalByteRenderer() : getHexadecimalByteRenderer();
+		default:
+			System.err.println("Erro na hora de obter o table renderer. Isto não deve executar!");
+			return getDefaultRenderer();
+		}
 	}
 
 	@Override
@@ -55,7 +61,7 @@ public class DataTable extends Table {
 			this.data = new Object[MEMORY_SIZE][2];
 
 			for (int i = 0; i < MEMORY_SIZE; ++i) {
-				this.data[i] = new Object[] { i, 0 };
+				this.data[i] = new Object[] { (short) i, (byte) 0 };
 			}
 		}
 	}

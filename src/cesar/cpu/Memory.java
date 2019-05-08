@@ -33,12 +33,7 @@ public class Memory {
 
     public byte readByte(short address) {
         ++bytesRead;
-        return data[UnsignedShorts.toInt(address)];
-    }
-
-    public byte readByte(int address) {
-        ++bytesRead;
-        return data[address];
+        return data[Short.toUnsignedInt(address)];
     }
 
     public short readWord(short address) {
@@ -50,19 +45,21 @@ public class Memory {
             msb = readByte(address);
             lsb = readByte((short) (address + 1));
         }
-        return UnsignedShorts.bytesToShort(msb, lsb);
+        return Memory.bytesToShort(msb, lsb);
     }
 
     public void writeByte(short address, byte value) {
         ++bytesWritten;
-        int index = UnsignedShorts.toInt(address);
+        int index = Short.toUnsignedInt(address);
         data[index] = value;
         cpu.notifyMemoryChange(index, value);
     }
     
     public void writeWord(short address, short value) {
-    	writeByte(address, (byte) (0xFF00 & value));
-    	writeByte((short) (address + 1), (byte) (0x00FF & value));
+    	byte msb = (byte) ((0xFF00 & value) >> 8);
+    	byte lsb = (byte) (0x00FF & value);
+    	writeByte(address, msb);
+    	writeByte((short) (address + 1), lsb);
     }
 
     public byte[] getDisplayBytes() {
@@ -80,4 +77,8 @@ public class Memory {
     public long getNumberOfMemoryAccesses() {
         return getNumberOfBytesRead() + getNumberOfBytesWritten();
     }
+
+	public static short bytesToShort(byte a, byte b) {
+	    return (short) (((0xFF & a) << 8) | (0xFF & b));
+	}
 }

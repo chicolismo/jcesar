@@ -10,200 +10,355 @@ import java.util.Objects;
  * Ou seja, quando o bit mais significativo passa de 0 para 1 durante uma soma.
  *
  * Quando não há espaço para enviar o vai-um, temos um carry.
+ * 
+ * Overflow: quando soma dois positivos e o resultado é negativo.
  */
 public class ALU {
-    private ConditionRegister register;
+	private static final short MSB = (short) 0b1000_0000_0000_0000;
+	private static final short LSB = 1;
 
-    public ALU(ConditionRegister register) {
-        this.register = Objects.requireNonNull(register);
-    }
+	private ConditionRegister register;
 
-    public boolean isOverflow(short a, short b, short c) {
-        return (a > 0 && b > 0 && c < 0) || (a < 0 && b < 0 && c > 0);
-    }
+	public ALU(ConditionRegister register) {
+		this.register = Objects.requireNonNull(register);
+	}
 
-    public boolean isCarryAdd(short a, short b) {
-        return UnsignedShorts.toInt(a) + UnsignedShorts.toInt(b) > 0xFFFF;
-    }
+	public boolean isOverflow(short a, short b, short c) {
+		return (a > 0 && b > 0 && c < 0) || (a < 0 && b < 0 && c > 0);
+	}
 
-    public boolean isCarrySub(short a, short b) {
-        return UnsignedShorts.toInt(a) - UnsignedShorts.toInt(b) < 0;
-    }
+	public boolean isCarryAdd(short a, short b) {
+		return Short.toUnsignedInt(a) + Short.toUnsignedInt(b) > 0xFFFF;
+	}
 
-    /**
-     * Zera o operando.
-     * N = t
-     * Z = t
-     * V = 0
-     * C = 0
-     * Testa as condições N e Z, e zera as condições V e C.
-     * @param operand
-     * @return 0
-     */
-    public short clr(short operand) {
-        register.setNegative(false);
-        register.setZero(true);
-        register.setCarry(false);
-        register.setOverflow(false);
-        return (short) 0;
-    }
+	public boolean isCarrySub(short a, short b) {
+		return Short.toUnsignedInt(a) - Short.toUnsignedInt(b) < 0;
+	}
 
-    /**
-     * Nega o operando.
-     * N = t
-     * Z = t
-     * C = 1
-     * O = 0
-     * @param operand
-     * @return ~(operand)
-     */
-    public short not(short operand) {
-        operand = (short) ~operand;
-        register.setNegative(operand < 0);
-        register.setZero(operand == 0);
-        register.setCarry(true);
-        register.setOverflow(false);
-        return operand;
-    }
+	private boolean xor(boolean a, boolean b) {
+		return ((a || b) && !(a && b));
+	}
 
-    /**
-     * Incrementa o operando.
-     * @param operand
-     * @return operand + 1
-     */
-    public short inc(short operand) {
-        short newValue = (short) (operand + 1);
-        register.setNegative(newValue < 0);
-        register.setZero(newValue == 0);
-        register.setCarry(isCarryAdd(operand, (short) 1));
-        register.setOverflow(isOverflow(operand, (short) 1, newValue));
-        return newValue;
-    }
+	/**
+	 * Zera o operando. N = t Z = t V = 0 C = 0 Testa as condições N e Z, e zera as
+	 * condições V e C.
+	 * 
+	 * @param operand
+	 * @return 0
+	 */
+	public short clr(short operand) {
+		register.setNegative(false);
+		register.setZero(true);
+		register.setCarry(false);
+		register.setOverflow(false);
+		return (short) 0;
+	}
 
-    public short dec(short operand) {
-        short newValue = (short) (operand - 1);
-        register.setNegative(newValue < 0);
-        register.setZero(newValue == 0);
-        register.setCarry(isCarrySub(operand, (short) 1));
-        register.setOverflow(isOverflow(operand, (short) -1, newValue));
-        return newValue;
-    }
+	/**
+	 * Nega o operando. N = t Z = t C = 1 O = 0
+	 * 
+	 * @param operand
+	 * @return ~(operand)
+	 */
+	public short not(short operand) {
+		operand = (short) ~operand;
+		register.setNegative(operand < 0);
+		register.setZero(operand == 0);
+		register.setCarry(true);
+		register.setOverflow(false);
+		return operand;
+	}
 
-    public short neg(short operand) {
-        short newValue = (short) (~operand + 1);
-        register.setZero(newValue == 0);
-        register.setNegative(newValue < 0);
-        register.setCarry(isCarryAdd((short) ~operand, (short) 1));
-        register.setOverflow(isOverflow((short) ~operand, (short) 1, newValue));
-        return newValue;
-    }
+	/**
+	 * Incrementa o operando.
+	 * 
+	 * @param operand
+	 * @return operand + 1
+	 */
+	public short inc(short operand) {
+		short newValue = (short) (operand + 1);
+		register.setNegative(newValue < 0);
+		register.setZero(newValue == 0);
+		register.setCarry(isCarryAdd(operand, (short) 1));
+		register.setOverflow(isOverflow(operand, (short) 1, newValue));
+		return newValue;
+	}
 
-    public short tst(short operand) {
-        register.setZero(operand == 0);
-        register.setNegative(operand < 0);
-        register.setCarry(false);
-        register.setOverflow(false);
-        return operand;
-    }
+	public short dec(short operand) {
+		short newValue = (short) (operand - 1);
+		register.setNegative(newValue < 0);
+		register.setZero(newValue == 0);
+		register.setCarry(isCarrySub(operand, (short) 1));
+		register.setOverflow(isOverflow(operand, (short) -1, newValue));
+		return newValue;
+	}
 
-    public short ror(short operand) {
-        int lsb = operand & 1;
-        operand = (short) (operand >> 1);
-        boolean carry = lsb == 1;
-        if (carry) {
-            operand = (short) (0b10000000 | operand);
-        }
-        boolean zero = operand == 0;
-        register.setZero(zero);
-        register.setNegative(operand < 0);
-        register.setCarry(carry);
-        register.setOverflow(zero != carry);
-        return operand;
-    }
+	public short neg(short operand) {
+		short newValue = (short) (~operand + 1);
+		register.setZero(newValue == 0);
+		register.setNegative(newValue < 0);
+		register.setCarry(isCarrySub((short) ~operand, (short) 1));
+		register.setOverflow(isOverflow((short) ~operand, (short) 1, newValue));
+		return newValue;
+	}
 
-    public short rol(short operand) {
-        int msb = operand & 0b10000000;
+	public short tst(short operand) {
+		register.setZero(operand == 0);
+		register.setNegative(operand < 0);
+		register.setCarry(false);
+		register.setOverflow(false);
+		return operand;
+	}
+
+	public short ror(short operand) {
+		int lsb = operand & LSB;
+		operand = (short) (operand >> 1);
+		boolean carry = lsb == 1;
+		if (carry) {
+			operand = (short) (MSB | operand);
+		}
+		boolean negative = operand < 0;
+		register.setZero(operand == 0);
+		register.setNegative(negative);
+		register.setCarry(carry);
+		register.setOverflow(xor(negative, carry));
+		return operand;
+	}
+
+	public short rol(short operand) {
+        int msb = operand & MSB;
         operand = (short) (operand << 1);
-        boolean carry = msb == 0b10000000;
+        boolean carry = msb == MSB;
         if (carry) {
-            operand = (short) (1 | operand);
+            operand = (short) (LSB | operand);
         }
-        boolean zero = operand == 0;
-        register.setZero(zero);
-        register.setNegative(operand < 0);
-        register.setCarry(carry);
-        register.setOverflow(zero != carry);
-        return operand;
-    }
-
-    public short asr(short operand) {
-        short msb = (short) (0b10000000 & operand);
-        short lsb = (short) (0b00000001 & operand);
-        boolean carry = lsb > 0;
-        boolean negative = msb > 0;
-        operand = (short) (operand >> 1);
-        if (negative) {
-            operand = (short) (0b10000000 | operand);
-        }
-        boolean zero = operand == 0;
-        register.setZero(zero);
+        boolean negative = operand < 0;
+        register.setZero(operand == 0);
         register.setNegative(negative);
         register.setCarry(carry);
-        register.setOverflow(zero != carry);
+        register.setOverflow(xor(negative, carry));
         return operand;
     }
 
-    public short asl(short operand) {
-        short msb = (short) (0b10000000 & operand);
-        boolean negative = msb > 0;
-        boolean carry = negative;
-        operand = (short) (operand << 1);
-        if (negative) {
-            operand = (short) (0b10000000 | operand);
-        }
-        boolean zero = operand == 0;
-        register.setZero(zero);
-        register.setNegative(negative);
-        register.setCarry(carry);
-        register.setOverflow(zero != carry);
-        return operand;
-    }
+	public short asr(short operand) {
+		short msb = (short) (MSB & operand);
+		short lsb = (short) (LSB & operand);
+		boolean carry = lsb == LSB;
+		boolean negative = msb == MSB;
+		operand = (short) (operand >> 1);
+		if (negative) {
+			operand = (short) (MSB | operand);
+		}
+		register.setZero(operand == 0);
+		register.setNegative(negative);
+		register.setCarry(carry);
+		register.setOverflow(xor(negative, carry));
+		return operand;
+	}
 
-    public short adc(short operand) {
-        boolean carry = register.isCarry();
-        short newValue = operand;
-        if (carry) {
-            newValue = (short) (operand + 1);
-        }
-        register.setZero(newValue == 0);
-        register.setNegative(newValue < 0);
-        if (carry) {
-            register.setCarry(isCarryAdd(operand, (short) 1));
-            register.setOverflow(isOverflow(operand, (short) 1, newValue));
-        }
-        else {
-            register.setCarry(false);
-            register.setOverflow(false);
-        }
-        return newValue;
-    }
+	// TODO: Perguntar sobre isto.
+	public short asl(short operand) {
+		operand = (short) (operand << 1);
+		short msb = (short) (MSB & operand);
+		boolean negative = msb == MSB;
+		boolean carry = negative;
+		/*
+		if (negative) {
+			operand = (short) (MSB | operand);
+		}
+		*/
+		register.setZero(operand == 0);
+		register.setNegative(negative);
+		register.setCarry(carry);
+		register.setOverflow(xor(negative, carry));
+		return operand;
+	}
 
-    public short sbc(short operand) {
-        boolean carry = register.isCarry();
-        short newValue = operand;
-        if (carry) {
-            newValue = (short) (operand - 1);
-        }
-        register.setZero(newValue == 0);
-        register.setNegative(newValue < 0);
-        if (carry) {
-            register.setCarry(isCarrySub(operand, (short) 1));
-            register.setOverflow(isOverflow(operand, (short) 1, newValue));
-        }
-        else {
-            register.setCarry(false);
-            register.setOverflow(false);
-        }
-        return newValue;
-    }
+	public short adc(short operand) {
+		boolean carry = register.isCarry();
+		short newValue = operand;
+		if (carry) {
+			newValue = (short) (operand + 1);
+		}
+		register.setZero(newValue == 0);
+		register.setNegative(newValue < 0);
+		register.setCarry(carry && isCarryAdd(operand, (short) 1));
+		register.setOverflow(carry && isOverflow(operand, (short) 1, newValue));
+		return newValue;
+	}
+
+	public short sbc(short operand) {
+		boolean carry = register.isCarry();
+		short newValue = operand;
+		if (carry) {
+			newValue = (short) (operand - 1);
+		}
+		register.setZero(newValue == 0);
+		register.setNegative(newValue < 0);
+		register.setCarry(carry && isCarrySub(operand, (short) 1));
+		register.setOverflow(carry && isOverflow(operand, (short) -1, newValue));
+		return newValue;
+	}
+
+	public short executeInstruction(int instructionCode, short operand) {
+		switch (instructionCode) {
+		case 0: /* CLR: op <- 0 */
+			operand = clr(operand);
+			break;
+		case 1: /* NOT: op <- NOT(op) */
+			operand = not(operand);
+			break;
+		case 2: /* INC: op <- op + 1 */
+			operand = inc(operand);
+			break;
+		case 3: /* DEC: op <- op - 1 */
+			operand = dec(operand);
+			break;
+		case 4: /* NEG: op <- -op */
+			operand = neg(operand);
+			break;
+		case 5: /* TST: op <- op */
+			operand = tst(operand);
+			break;
+		case 6: /* ROR: op <- SHR(c & op) */
+			operand = ror(operand);
+			break;
+		case 7: /* ROL: op <- SHL(op & c) */
+			operand = rol(operand);
+			break;
+		case 8: /* ASR: op <- SHR(msb & op) */
+			operand = asr(operand);
+			break;
+		case 9: /* ASL: op <- SHL(op & 0) */
+			operand = asl(operand);
+			break;
+		case 10: /* ADC: op <- op + c */
+			operand = adc(operand);
+			break;
+		case 11: /* SBC: op <- op - c */
+			operand = sbc(operand);
+			break;
+		default:
+			System.err.println("Operação inválida");
+		}
+		return operand;
+	}
+
+	public short executeInstruction(int code, short src, short dst) {
+		short result = 0;
+		switch (code) {
+		case 1: /* mov */
+			result = mov(src, dst);
+			break;
+		case 2: /* add */
+			result = add(src, dst);
+			break;
+		case 3: /* sub */
+			result = sub(src, dst);
+			break;
+		case 4: /* cmp */
+			cmp(src, dst);
+			break;
+		case 5: /* and */
+			result = and(src, dst);
+			break;
+		case 6: /* or */
+			result = or(src, dst);
+			break;
+		default:
+			// TODO: Avisar sobre operação inválida
+			System.err.println("Operação inválida");
+		}
+		return result;
+	}
+
+	/**
+	 * Envia o valor de dst para src N = t Z = t V = 0 C = -
+	 * 
+	 * @param src
+	 * @param dst
+	 * @return src
+	 */
+	private short mov(short src, short dst) {
+		register.setZero(src == 0);
+		register.setNegative(src < 0);
+		register.setOverflow(false);
+		return src;
+	}
+
+	/**
+	 * Soma dst + src N = t Z = t V = t C = t
+	 * 
+	 * @param src
+	 * @param dst
+	 * @return dst + src
+	 */
+	private short add(short src, short dst) {
+		short result = (short) (dst + src);
+		register.setNegative(result < 0);
+		register.setZero(result == 0);
+		register.setCarry(isCarryAdd(dst, src));
+		register.setOverflow(isOverflow(dst, src, result));
+		return result;
+	}
+
+	/**
+	 * Subtrai dst - src N = t Z = t V = t C = not(t)
+	 * 
+	 * @param src
+	 * @param dst
+	 * @return dst - src;
+	 */
+	private short sub(short src, short dst) {
+		short result = (short) (dst - src);
+		register.setNegative(result < 0);
+		register.setZero(result == 0);
+		register.setCarry(isCarrySub(dst, src));
+		register.setOverflow(isOverflow(dst, (short) -src, result));
+		return result;
+	}
+
+	/**
+	 * Compara src - dst N = t Z = t V = t C = not(t)
+	 * 
+	 * @param src
+	 * @param dst
+	 */
+	private void cmp(short src, short dst) {
+		short result = (short) (src - dst);
+		register.setNegative(result < 0);
+		register.setZero(result == 0);
+		register.setCarry(isCarrySub(src, dst));
+		register.setOverflow(isOverflow(src, (short) -dst, result));
+	}
+
+	/**
+	 * Realiza AND entre os bits de src e dst. N = t Z = t V = 0 C = -
+	 * 
+	 * @param src
+	 * @param dst
+	 * @return dst & src
+	 */
+	private short and(short src, short dst) {
+		short result = (short) (dst & src);
+		register.setNegative(result < 0);
+		register.setZero(result == 0);
+		register.setOverflow(false);
+		return result;
+	}
+
+	/**
+	 * Realiza OR entre os bits de src e dst. N = t Z = t V = 0 C = -
+	 * 
+	 * @param src
+	 * @param dst
+	 * @return dst | src
+	 */
+	private short or(short src, short dst) {
+		short result = (short) (dst | src);
+		register.setNegative(result < 0);
+		register.setZero(result == 0);
+		register.setOverflow(false);
+		return result;
+	}
 }

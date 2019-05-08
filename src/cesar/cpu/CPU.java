@@ -16,6 +16,7 @@ public class CPU {
 	}
 
 	private static final AddressMode[] ADDRESS_MODES = AddressMode.values();
+	private static final int CMP = 4;
 
 	private RegisterPanel[] registerPanels;
 	private ProgramTable programTable;
@@ -33,18 +34,20 @@ public class CPU {
 		this.registers = new short[8];
 		this.conditionRegister = new ConditionRegister();
 		this.alu = new ALU(this.conditionRegister);
-		
-		registers[1] = (short) 4;
 	}
-	
-	public void notifyMemoryChange(int index, byte value) {
-		Integer unsignedByte = UnsignedShorts.toInt(value);
-		programTable.setValueAtAndUpdate(unsignedByte, index, 2);
-		dataTable.setValueAtAndUpdate(unsignedByte, index, 1);
+
+	public void notifyMemoryChange(int index, byte b) {
+		Byte value = Byte.valueOf(b);
+		programTable.setValueAtAndUpdate(value, index, 2);
+		dataTable.setValueAtAndUpdate(value, index, 1);
 	}
 
 	public short[] getRegisters() {
 		return registers;
+	}
+
+	public void setRegisterValue(int regNumber, short value) {
+		registers[regNumber] = value;
 	}
 
 	public void setRegisterPanels(RegisterPanel[] panels) {
@@ -84,7 +87,7 @@ public class CPU {
 	private void updateTables() {
 		final int memorySize = memory.size();
 		for (int i = 0; i < memorySize; ++i) {
-			final int value = UnsignedBytes.toInt(memory.readByte(i));
+			Byte value = Byte.valueOf(memory.readByte((short) i));
 			programTable.setValueAt(value, i, 2);
 			dataTable.setValueAt(value, i, 1);
 		}
@@ -134,7 +137,7 @@ public class CPU {
 
 		case 0b0100: { /* Desvio incondicional (JMP) */
 			byte secondByte = fetchByte();
-			short word = UnsignedShorts.bytesToShort(firstByte, secondByte);
+			short word = Memory.bytesToShort(firstByte, secondByte);
 			jmp(word);
 			break;
 		}
@@ -151,27 +154,20 @@ public class CPU {
 		case 0b1000: { /* Instruções de 1 operando */
 			byte secondByte = fetchByte();
 			executeOneOperandInstruction(firstByte, secondByte);
-			// TODO: Continuar
 			break;
 		}
 
 		case 0b1001: /* MOV */
-			break;
-
 		case 0b1010: /* ADD */
-			break;
-
 		case 0b1011: /* SUB */
-			break;
-
 		case 0b1100: /* CMP */
-			break;
-
 		case 0b1101: /* AND */
+		case 0b1110: /* OR */ {
+			byte secondByte = fetchByte();
+			short word = Memory.bytesToShort(firstByte, secondByte);
+			executeTowOperandInstruction(word);
 			break;
-
-		case 0b1110: /* OR */
-			break;
+		}
 
 		case 0b1111: /* Instrução de parada (HLT) */
 			break;
@@ -196,53 +192,95 @@ public class CPU {
 
 		// 0bXXMM_MRRR
 		int addressMode = (0b0011_1000 & secondByte) >> 3; // Modo de endereçamento
-		int reg = 0b0000_0111 & secondByte; // O número do registrador
 
-		short operand = getOperand(addressMode, reg);
-		// TODO: Onde enfiar o operando???
-		switch (code) {
-		case 0: /* CLR: op <- 0 */
-			operand = alu.clr(operand);
-			break;
-		case 1: /* NOT: op <- NOT(op) */
-			operand = alu.not(operand);
-			break;
-		case 2: /* INC: op <- op + 1 */
-			operand = alu.inc(operand);
-			break;
-		case 3: /* DEC: op <- op - 1 */
-			operand = alu.dec(operand);
-			break;
-		case 4: /* NEG: op <- -op */
-			operand = alu.neg(operand);
-			break;
-		case 5: /* TST: op <- op */
-			operand = alu.tst(operand);
-			break;
-		case 6: /* ROR: op <- SHR(c & op) */
-			operand = alu.ror(operand);
-			break;
-		case 7: /* ROL: op <- SHL(op & c) */
-			operand = alu.rol(operand);
-			break;
-		case 8: /* ASR: op <- SHR(msb & op) */
-			operand = alu.asr(operand);
-			break;
-		case 9: /* ASL: op <- SHL(op & 0) */
-			operand = alu.asl(operand);
-			break;
-		case 10: /* ADC: op <- op + c */
-			operand = alu.adc(operand);
-			break;
-		case 11: /* SBC: op <- op - c */
-			operand = alu.sbc(operand);
-			break;
+		if (addressMode > 7) {
+			System.err.println("Modo de endereçamento inválido.");
+			System.exit(1);
 		}
 
+		int reg = 0b0000_0111 & secondByte; // O número do registrador
+
 		switch (ADDRESS_MODES[addressMode]) {
-		case REGISTER:
-			registers[reg] = operand;
+		case REGISTER: {
+			short operand = registers[reg];
+			registers[reg] = alu.executeInstruction(code, operand);
 			break;
+		}
+		case REGISTER_POST_INCREMENTED: {
+			short operand = memory.readWord(registers[reg]);
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord(registers[reg], result);
+			incrementRegister(reg, 2);
+			break;
+		}
+		case REGISTER_PRE_DECREMENTED: {
+			decrementRegister(reg, 2);
+			short operand = memory.readWord(registers[reg]);
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord(registers[reg], result);
+			break;
+		}
+		case INDEXED: {
+			short offset = memory.readWord(registers[7]);
+			incrementRegister(7, 2);
+			short operand = memory.readWord((short) (registers[reg] + offset));
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord((short) (registers[reg] + offset), result);
+			break;
+		}
+		case REGISTER_INDIRECT: {
+			short address = registers[reg];
+			short operand = memory.readWord(address);
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord(address, result);
+			break;
+		}
+		case POST_INCREMENTED_INDIRECT: {
+			short address = memory.readWord(registers[reg]);
+			short operand = memory.readWord(address);
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord(address, result);
+			incrementRegister(reg, 2);
+			break;
+		}
+		case PRE_DECREMENTED_INDIRECT: {
+			decrementRegister(reg, 2);
+			short address = memory.readWord(registers[reg]);
+			short operand = memory.readWord(address);
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord(address, result);
+			break;
+		}
+		case INDEX_INDIRECT: {
+			short offset = memory.readWord(registers[7]);
+			incrementRegister(7, 2);
+			short address = memory.readWord((short) (registers[reg] + offset));
+			short operand = memory.readWord(address);
+			short result = alu.executeInstruction(code, operand);
+			memory.writeWord(address, result);
+			break;
+		}
+		default:
+			// TODO: Tratar caso de código inválido.
+			break;
+		}
+	}
+
+	public void executeTowOperandInstruction(short word) {
+		              // 1CCC_MMMR_RRMM_MRRR
+		int code    = (0b0111_0000_0000_0000 & word) >> 12;
+		int srcMode = (0b0000_1110_0000_0000 & word) >> 9;
+		int srcReg  = (0b0000_0001_1100_0000 & word) >> 6;
+		int dstMode = (0b0000_0000_0011_1000 & word) >> 3;
+		int dstReg  = (0b0000_0000_0000_0111 & word);
+
+		// Primeiro operando
+		short src = 0;
+		switch (ADDRESS_MODES[srcMode]) {
+		case REGISTER: {
+			src = registers[srcReg];
+			break;
+		}
 		case REGISTER_POST_INCREMENTED:
 			break;
 		case REGISTER_PRE_DECREMENTED:
@@ -250,7 +288,6 @@ public class CPU {
 		case INDEXED:
 			break;
 		case REGISTER_INDIRECT:
-			memory.writeWord(registers[reg], operand);
 			break;
 		case POST_INCREMENTED_INDIRECT:
 			break;
@@ -258,7 +295,31 @@ public class CPU {
 			break;
 		case INDEX_INDIRECT:
 			break;
-		default:
+		}
+
+		short dst = 0;
+		switch (ADDRESS_MODES[dstMode]) {
+		case REGISTER: {
+			dst = registers[dstReg];
+			short result = alu.executeInstruction(code, src, dst);
+			if (code != CMP) {
+				registers[dstReg] = result;
+			}
+			break;
+		}
+		case REGISTER_POST_INCREMENTED:
+			break;
+		case REGISTER_PRE_DECREMENTED:
+			break;
+		case INDEXED:
+			break;
+		case REGISTER_INDIRECT:
+			break;
+		case POST_INCREMENTED_INDIRECT:
+			break;
+		case PRE_DECREMENTED_INDIRECT:
+			break;
+		case INDEX_INDIRECT:
 			break;
 		}
 	}
@@ -289,10 +350,10 @@ public class CPU {
 		// 0b0100_XXXX_XXMM_MRRR
 
 		// Modo de endereçamentos são os bits 3, 4, e 5.
-		int addressMode = (0b0011_1000 & word) >> 3;
+		int addressMode = (0b0000_0000_0011_1000 & word) >> 3;
 
 		// O número do registrador são os bits 0, 1 e 2
-		int registerNumber = 0b0111 & word;
+		int registerNumber = 0b0000_0000_0000_0111 & word;
 
 		registers[7] = getOperand(addressMode, registerNumber);
 	}
@@ -373,7 +434,7 @@ public class CPU {
 
 	private void updateRegisterDisplays() {
 		for (int i = 0; i < 8; ++i) {
-			registerPanels[i].setValue(UnsignedShorts.toInt(registers[i]));
+			registerPanels[i].setValue(Short.toUnsignedInt(registers[i]));
 		}
 		conditionsPanel.setNegative(conditionRegister.isNegative());
 		conditionsPanel.setZero(conditionRegister.isZero());
