@@ -6,6 +6,8 @@ import javax.swing.table.TableColumnModel;
 
 public class ProgramTable extends Table {
 	private static final long serialVersionUID = 2477981247131807536L;
+	
+	private int programCounterRow = 0;
 
 	private static final Class<?>[] COLUMN_CLASSES = new Class[] { String.class, Short.class, Byte.class,
 			String.class };
@@ -13,6 +15,8 @@ public class ProgramTable extends Table {
 	public ProgramTable() {
 		super();
 		setModel(new ProgramTable.ProgramTableModel());
+
+		setProgramCounterRow(0);
 
 		TableColumnModel columnModel = getColumnModel();
 		TableColumn column;
@@ -34,8 +38,16 @@ public class ProgramTable extends Table {
 		column.setMaxWidth(70);
 		column.setWidth(column.getPreferredWidth());
 		column.setResizable(false);
+		
 	}
-
+	
+	public void setProgramCounterRow(int row) {
+	    int oldValue = programCounterRow;
+	    programCounterRow = row;
+	    
+	    //
+	}
+	
 	@Override
 	public TableCellRenderer getCellRenderer(int row, int col) {
 		switch (col) {

@@ -25,9 +25,16 @@ import java.awt.event.ComponentEvent;
 class Window extends JFrame {
     private static final long serialVersionUID = 7470189528132411359L;
 
+    /**
+     * Espaço entre a janela principal e os painéis laterais.
+     */
+    private static final int WINDOW_SPACING = 10;
+
     private SidePanel programPanel;
     private SidePanel dataPanel;
     private DisplayPanel displayPanel;
+
+    @SuppressWarnings("unused")
     private Controller controller;
 
     Window() {
@@ -53,7 +60,6 @@ class Window extends JFrame {
         MenuBar menuBar = new MenuBar(this);
         this.setJMenuBar(menuBar);
 
-        //this.controller = new Controller(this, mainPanel, programPanel, dataPanel, displayPanel, menuBar);
         Controller controller = new Controller(this, mainPanel, programPanel, dataPanel, displayPanel, menuBar);
         this.controller = controller;
         initEvents();
@@ -77,12 +83,11 @@ class Window extends JFrame {
     }
 
     private void updatePositions() {
-        int spacing = 10;
         Point location = getLocation();
-        programPanel.setLocation(location.x - programPanel.getWidth() - spacing, location.y);
-        dataPanel.setLocation(location.x + getWidth() + spacing, location.y);
-        displayPanel.setLocation(location.x - programPanel.getWidth() - spacing,
-            location.y + programPanel.getHeight() + spacing);
+        programPanel.setLocation(location.x - programPanel.getWidth() - WINDOW_SPACING, location.y);
+        dataPanel.setLocation(location.x + getWidth() + WINDOW_SPACING, location.y);
+        displayPanel.setLocation(location.x - programPanel.getWidth() - WINDOW_SPACING,
+            location.y + programPanel.getHeight() + WINDOW_SPACING);
     }
 
     private void center() {

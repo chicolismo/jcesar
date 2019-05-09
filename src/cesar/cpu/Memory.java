@@ -2,6 +2,8 @@ package cesar.cpu;
 
 import java.util.Arrays;
 
+import cesar.util.Shorts;
+
 public class Memory {
     private static final int MEMORY_SIZE = 1 << 16;
 
@@ -37,7 +39,7 @@ public class Memory {
 
     public byte readByte(short address) {
         ++bytesRead;
-        return data[Short.toUnsignedInt(address)];
+        return data[Shorts.toUnsignedInt(address)];
     }
 
     public short readWord(short address) {
@@ -57,7 +59,7 @@ public class Memory {
 
     public void writeByte(short address, byte value) {
         ++bytesWritten;
-        int index = Short.toUnsignedInt(address);
+        int index = Shorts.toUnsignedInt(address);
         data[index] = value;
         cpu.notifyMemoryChange(index, value);
     }

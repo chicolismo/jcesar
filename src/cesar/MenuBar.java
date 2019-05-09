@@ -1,9 +1,13 @@
 package cesar;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 class MenuBar extends JMenuBar {
     private static final long serialVersionUID = -687929457632692467L;
@@ -13,23 +17,26 @@ class MenuBar extends JMenuBar {
     private JMenuItem menuItemSaveFileAs;
     private JMenuItem menuItemExit;
 
+    private JMenuItem menuItemAbout;
+
     MenuBar(Window parent) {
-        var fileMenu = new JMenu("Arquivo");
-        var editMenu = new JMenu("Editar");
-        var viewMenu = new JMenu("Visualizar");
-        var helpMenu = new JMenu("?");
+        JMenu fileMenu = new JMenu("Arquivo");
+        JMenu editMenu = new JMenu("Editar");
+        JMenu viewMenu = new JMenu("Visualizar");
+        JMenu helpMenu = new JMenu("?");
 
         fileMenu.setMnemonic('a');
         editMenu.setMnemonic('e');
         viewMenu.setMnemonic('v');
-        helpMenu.setMnemonic('?');
+        helpMenu.setMnemonic('h');
 
-        menuItemLoadFile = new JMenuItem("Carregar...", KeyEvent.VK_C);
-        menuItemSaveFile = new JMenuItem("Salvar", KeyEvent.VK_S);
+        menuItemLoadFile   = new JMenuItem("Carregar...", KeyEvent.VK_C);
+        menuItemSaveFile   = new JMenuItem("Salvar", KeyEvent.VK_S);
         menuItemSaveFileAs = new JMenuItem("Salvar como...", KeyEvent.VK_V);
-        menuItemExit = new JMenuItem("Sair", KeyEvent.VK_R);
+        menuItemExit       = new JMenuItem("Sair", KeyEvent.VK_R);
 
-        int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        // int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
         menuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, mask));
         menuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, mask));
@@ -41,6 +48,10 @@ class MenuBar extends JMenuBar {
         fileMenu.add(getMenuItemSaveFileAs());
         fileMenu.addSeparator();
         fileMenu.add(getMenuItemExit());
+
+        menuItemAbout = new JMenuItem("Sobre", KeyEvent.VK_S);
+
+        helpMenu.add(menuItemAbout);
 
         this.add(fileMenu);
         this.add(editMenu);
@@ -62,5 +73,9 @@ class MenuBar extends JMenuBar {
 
     public JMenuItem getMenuItemExit() {
         return menuItemExit;
+    }
+
+    public JMenuItem getMenuItemAbout() {
+        return menuItemAbout;
     }
 }

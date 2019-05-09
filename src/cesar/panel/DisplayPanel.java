@@ -1,14 +1,15 @@
 package cesar.panel;
 
-import cesar.display.CharDisplay;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+
+import cesar.display.CharDisplay;
 
 public class DisplayPanel extends JDialog {
     private static final long serialVersionUID = -4447642329893150278L;
@@ -46,8 +47,6 @@ public class DisplayPanel extends JDialog {
     }
 
     private void initEvents() {
-        var panel = this;
-
         MouseAdapter mouseAdapter = new MouseAdapter() {
             Point clickPoint = null;
 
@@ -60,8 +59,7 @@ public class DisplayPanel extends JDialog {
             public void mouseDragged(MouseEvent event) {
                 Point newPoint = event.getLocationOnScreen();
                 newPoint.translate(-clickPoint.x, -clickPoint.y);
-                ;
-                panel.setLocation(newPoint);
+                DisplayPanel.this.setLocation(newPoint);
             }
         };
 

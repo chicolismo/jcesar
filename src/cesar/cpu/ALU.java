@@ -2,6 +2,8 @@ package cesar.cpu;
 
 import java.util.Objects;
 
+import cesar.util.Shorts;
+
 /*
  * Quando ao incrementar um número ele se tornar negativo, temos um caso de
  * overflow.  Isso é, não temos espaço suficiente para representar o sinal do
@@ -28,20 +30,19 @@ public class ALU {
     }
 
     public boolean isCarryAdd(short a, short b) {
-        return Short.toUnsignedInt(a) + Short.toUnsignedInt(b) > 0xFFFF;
+        return Shorts.toUnsignedInt(a) + Shorts.toUnsignedInt(b) > 0xFFFF;
     }
 
     public boolean isCarrySub(short a, short b) {
-        return Short.toUnsignedInt(a) - Short.toUnsignedInt(b) < 0;
-    }
-
-    private boolean xor(boolean a, boolean b) {
-        return ((a || b) && !(a && b));
+        return Shorts.toUnsignedInt(a) - Shorts.toUnsignedInt(b) < 0;
     }
 
     /**
-     * Zera o operando. N = t Z = t V = 0 C = 0 Testa as condições N e Z, e zera as
-     * condições V e C.
+     * Zera o operando.
+     * 
+     * N = t, Z = t, V = 0, C = 0
+     * 
+     * Testa as condições N e Z, e zera as condições V e C.
      * 
      * @param operand
      * @return 0
@@ -55,7 +56,9 @@ public class ALU {
     }
 
     /**
-     * Nega o operando. N = t Z = t C = 1 O = 0
+     * Nega o operando.
+     * 
+     * N = t, Z = t, C = 1, O = 0
      * 
      * @param operand
      * @return ~(operand)
@@ -121,7 +124,7 @@ public class ALU {
         register.setZero(operand == 0);
         register.setNegative(negative);
         register.setCarry(carry);
-        register.setOverflow(xor(negative, carry));
+        register.setOverflow(negative ^ carry);
         return operand;
     }
 
@@ -136,7 +139,7 @@ public class ALU {
         register.setZero(operand == 0);
         register.setNegative(negative);
         register.setCarry(carry);
-        register.setOverflow(xor(negative, carry));
+        register.setOverflow(negative ^ carry);
         return operand;
     }
 
@@ -152,7 +155,7 @@ public class ALU {
         register.setZero(operand == 0);
         register.setNegative(negative);
         register.setCarry(carry);
-        register.setOverflow(xor(negative, carry));
+        register.setOverflow(negative ^ carry);
         return operand;
     }
 
@@ -168,7 +171,7 @@ public class ALU {
         register.setZero(operand == 0);
         register.setNegative(negative);
         register.setCarry(carry);
-        register.setOverflow(xor(negative, carry));
+        register.setOverflow(negative ^ carry);
         return operand;
     }
 
@@ -285,7 +288,9 @@ public class ALU {
     }
 
     /**
-     * Soma dst + src N = t Z = t V = t C = t
+     * Soma dst + src
+     * 
+     * N = t, Z = t, V = t, C = t
      * 
      * @param src
      * @param dst
@@ -301,7 +306,9 @@ public class ALU {
     }
 
     /**
-     * Subtrai dst - src N = t Z = t V = t C = not(t)
+     * Subtrai dst - src
+     * 
+     * N = t, Z = t, V = t, C = not(t)
      * 
      * @param src
      * @param dst
@@ -317,7 +324,9 @@ public class ALU {
     }
 
     /**
-     * Compara src - dst N = t Z = t V = t C = not(t)
+     * Compara src - dst
+     * 
+     * N = t, Z = t, V = t, C = not(t)
      * 
      * @param src
      * @param dst
@@ -331,7 +340,9 @@ public class ALU {
     }
 
     /**
-     * Realiza AND entre os bits de src e dst. N = t Z = t V = 0 C = -
+     * Realiza AND entre os bits de src e dst.
+     * 
+     * N = t, Z = t, V = 0, C = -
      * 
      * @param src
      * @param dst
@@ -346,7 +357,9 @@ public class ALU {
     }
 
     /**
-     * Realiza OR entre os bits de src e dst. N = t Z = t V = 0 C = -
+     * Realiza OR entre os bits de src e dst.
+     * 
+     * N = t, Z = t, V = 0, C = -
      * 
      * @param src
      * @param dst
