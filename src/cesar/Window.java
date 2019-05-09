@@ -48,8 +48,7 @@ class Window extends JFrame {
         setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 
         JPanel contentPane = new JPanel(true);
-        Border inner = new CompoundBorder(new BevelBorder(BevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));
-        Border border = new CompoundBorder(new EmptyBorder(2, 2, 2, 2), inner);
+        Border border = new CompoundBorder(new BevelBorder(BevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));
         contentPane.setBorder(border);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setContentPane(contentPane);
@@ -72,6 +71,7 @@ class Window extends JFrame {
         this.controller = controller;
         initEvents();
         pack();
+        setResizable(false);
         center();
         updatePositions();
         setVisible(true);
@@ -81,7 +81,6 @@ class Window extends JFrame {
         programPanel.setSize(350, 500);
         dataPanel.setSize(160, 500);
         dataPanel.getTable().scrollToRow(1024);
-//        setResizable(false);
     }
 
     private SidePanel createSidePanel(String title, Table table) {

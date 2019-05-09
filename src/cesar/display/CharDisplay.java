@@ -1,10 +1,13 @@
 package cesar.display;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
 
 public class CharDisplay extends JPanel {
     private static final long serialVersionUID = 4304849380002674639L;
@@ -15,7 +18,7 @@ public class CharDisplay extends JPanel {
     private static final int START_Y = 4;
     private static final int START_X = 1;
     private static final int CHAR_OFFSET = CHAR_WIDTH + 1;
-    private static final int WIDTH = CHAR_OFFSET * SIZE + 1;
+    private static final int WIDTH = CHAR_OFFSET * SIZE + 2;
     private static final int HEIGHT = CHAR_HEIGHT + 8;
     private static final int NUMBER_OF_CHARACTERS = 95;
 
@@ -29,7 +32,8 @@ public class CharDisplay extends JPanel {
             for (int i = 0; i < NUMBER_OF_CHARACTERS; ++i) {
                 charImages[i] = ImageIO.read(CharDisplay.class.getResourceAsStream(String.format(format, i)));
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.err.println("Erro ao tentar ler as imagens dos caracteres.");
             e.printStackTrace();
             System.exit(1);
@@ -52,7 +56,8 @@ public class CharDisplay extends JPanel {
     public void setValueAt(int index, char value) {
         if (value >= 32 && value <= 126) {
             this.value[index] = value;
-        } else {
+        }
+        else {
             this.value[index] = ' ';
         }
     }

@@ -1,12 +1,18 @@
 package cesar.panel;
 
-import cesar.display.CharDisplay;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import java.awt.*;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.BoxLayout;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+
+import cesar.display.CharDisplay;
 
 public class DisplayPanel extends JDialog {
     private static final long serialVersionUID = -4447642329893150278L;
@@ -15,15 +21,19 @@ public class DisplayPanel extends JDialog {
 
     public DisplayPanel(JFrame parent, String title) {
         super(parent, title);
-        display = new CharDisplay();
+        this.display = new CharDisplay();
 
         JPanel panel = new JPanel(true);
-        this.setContentPane(panel);
-        this.setUndecorated(true);
-        panel.add(display);
-        panel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        initEvents();
+        BevelBorder border = new BevelBorder(BevelBorder.RAISED);
+//        Border border = AdvancedBevelBorder.withDefaults();
+        panel.setBorder(new CompoundBorder(border, new EmptyBorder(1, 1, 1, 1)));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(this.display);
+        setUndecorated(true);
+        setContentPane(panel);
         pack();
+        setResizable(false);
+        initEvents();
     }
 
     public void setValue(String string) {
@@ -63,4 +73,5 @@ public class DisplayPanel extends JDialog {
         this.addMouseListener(mouseAdapter);
         this.addMouseMotionListener(mouseAdapter);
     }
+
 }

@@ -2,6 +2,7 @@ package cesar.table;
 
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.awt.SystemColor;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -34,11 +35,16 @@ public abstract class Table extends JTable {
         setColumnSelectionAllowed(false);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+
         JTableHeader header = getTableHeader();
-        header.setDefaultRenderer(new CellRenderer.CenteredTableCellRenderer());
+        DefaultTableCellRenderer renderer = new CellRenderer.CenteredTableCellRenderer();
+        renderer.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+        // renderer.setBackground(SystemColor.window);
+        renderer.setBackground(SystemColor.control);
+        header.setDefaultRenderer(renderer);
         header.setReorderingAllowed(false);
 
-        setFont(new Font("monospaced", Font.PLAIN, 12));
     }
 
     @Override
