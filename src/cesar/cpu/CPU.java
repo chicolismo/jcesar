@@ -78,11 +78,7 @@ public class CPU {
     }
 
     private void decrementRegister(int registerNumber) {
-        decrementRegister(registerNumber, 2);
-    }
-
-    private void decrementRegister(int registerNumber, int amount) {
-        setRegister(registerNumber, (short) (getRegister(registerNumber) - amount));
+        setRegister(registerNumber, (short) (getRegister(registerNumber) - 2));
     }
 
     public void notifyMemoryChange(int index, byte b) {
@@ -135,7 +131,7 @@ public class CPU {
 
     /**
      * Lê o byte cujo endereço está no R7. Incrementa o R7 em 1.
-     * 
+     *
      * @return byte da memória cujo endereço se encontra atualmente no PC.
      */
     private byte fetchByte() {
@@ -561,7 +557,7 @@ public class CPU {
         }
     }
 
-    private void updateRegisterDisplays() {
+    public void updateRegisterDisplays() {
         for (int i = 0; i < 8; ++i) {
             registerPanels[i].setValue(Shorts.toUnsignedInt(getRegister(i)));
         }

@@ -20,6 +20,8 @@ class MenuBar extends JMenuBar {
     private JMenuItem menuItemAbout;
 
     MenuBar(Window parent) {
+        setBorderPainted(false);
+
         JMenu fileMenu = new JMenu("Arquivo");
         JMenu editMenu = new JMenu("Editar");
         JMenu viewMenu = new JMenu("Visualizar");

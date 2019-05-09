@@ -1,8 +1,8 @@
 package cesar.cpu;
 
-import java.util.Objects;
-
 import cesar.util.Shorts;
+
+import java.util.Objects;
 
 /*
  * Quando ao incrementar um número ele se tornar negativo, temos um caso de
@@ -12,7 +12,7 @@ import cesar.util.Shorts;
  * Ou seja, quando o bit mais significativo passa de 0 para 1 durante uma soma.
  *
  * Quando não há espaço para enviar o vai-um, temos um carry.
- * 
+ *
  * Overflow: quando soma dois positivos e o resultado é negativo.
  */
 public class ALU {
@@ -25,29 +25,29 @@ public class ALU {
         this.register = Objects.requireNonNull(register);
     }
 
-    public boolean isOverflow(short a, short b, short c) {
+    private boolean isOverflow(short a, short b, short c) {
         return (a > 0 && b > 0 && c < 0) || (a < 0 && b < 0 && c > 0);
     }
 
-    public boolean isCarryAdd(short a, short b) {
+    private boolean isCarryAdd(short a, short b) {
         return Shorts.toUnsignedInt(a) + Shorts.toUnsignedInt(b) > 0xFFFF;
     }
 
-    public boolean isCarrySub(short a, short b) {
+    private boolean isCarrySub(short a, short b) {
         return Shorts.toUnsignedInt(a) - Shorts.toUnsignedInt(b) < 0;
     }
 
     /**
      * Zera o operando.
-     * 
+     * <p>
      * N = t, Z = t, V = 0, C = 0
-     * 
+     * <p>
      * Testa as condições N e Z, e zera as condições V e C.
-     * 
+     *
      * @param operand
      * @return 0
      */
-    public short clr(short operand) {
+    private short clr(short operand) {
         register.setNegative(false);
         register.setZero(true);
         register.setCarry(false);
@@ -57,13 +57,13 @@ public class ALU {
 
     /**
      * Nega o operando.
-     * 
+     * <p>
      * N = t, Z = t, C = 1, O = 0
-     * 
+     *
      * @param operand
      * @return ~(operand)
      */
-    public short not(short operand) {
+    private short not(short operand) {
         operand = (short) ~operand;
         register.setNegative(operand < 0);
         register.setZero(operand == 0);
@@ -74,11 +74,11 @@ public class ALU {
 
     /**
      * Incrementa o operando.
-     * 
+     *
      * @param operand
      * @return operand + 1
      */
-    public short inc(short operand) {
+    private short inc(short operand) {
         short newValue = (short) (operand + 1);
         register.setNegative(newValue < 0);
         register.setZero(newValue == 0);
@@ -87,7 +87,7 @@ public class ALU {
         return newValue;
     }
 
-    public short dec(short operand) {
+    private short dec(short operand) {
         short newValue = (short) (operand - 1);
         register.setNegative(newValue < 0);
         register.setZero(newValue == 0);
@@ -96,7 +96,7 @@ public class ALU {
         return newValue;
     }
 
-    public short neg(short operand) {
+    private short neg(short operand) {
         short newValue = (short) (~operand + 1);
         register.setZero(newValue == 0);
         register.setNegative(newValue < 0);
@@ -105,15 +105,14 @@ public class ALU {
         return newValue;
     }
 
-    public short tst(short operand) {
+    private void tst(short operand) {
         register.setZero(operand == 0);
         register.setNegative(operand < 0);
         register.setCarry(false);
         register.setOverflow(false);
-        return operand;
     }
 
-    public short ror(short operand) {
+    private short ror(short operand) {
         int lsb = operand & LSB;
         operand = (short) (operand >> 1);
         boolean carry = lsb == 1;
@@ -128,7 +127,7 @@ public class ALU {
         return operand;
     }
 
-    public short rol(short operand) {
+    private short rol(short operand) {
         int msb = operand & MSB;
         operand = (short) (operand << 1);
         boolean carry = msb == MSB;
@@ -143,7 +142,7 @@ public class ALU {
         return operand;
     }
 
-    public short asr(short operand) {
+    private short asr(short operand) {
         short msb = (short) (MSB & operand);
         short lsb = (short) (LSB & operand);
         boolean carry = lsb == LSB;
@@ -160,7 +159,7 @@ public class ALU {
     }
 
     // TODO: Perguntar sobre isto.
-    public short asl(short operand) {
+    private short asl(short operand) {
         operand = (short) (operand << 1);
         short msb = (short) (MSB & operand);
         boolean negative = msb == MSB;
@@ -175,7 +174,7 @@ public class ALU {
         return operand;
     }
 
-    public short adc(short operand) {
+    private short adc(short operand) {
         boolean carry = register.isCarry();
         short newValue = operand;
         if (carry) {
@@ -188,7 +187,7 @@ public class ALU {
         return newValue;
     }
 
-    public short sbc(short operand) {
+    private short sbc(short operand) {
         boolean carry = register.isCarry();
         short newValue = operand;
         if (carry) {
@@ -203,44 +202,44 @@ public class ALU {
 
     public short executeInstruction(int instructionCode, short operand) {
         switch (instructionCode) {
-        case 0: /* CLR: op <- 0 */
-            operand = clr(operand);
-            break;
-        case 1: /* NOT: op <- NOT(op) */
-            operand = not(operand);
-            break;
-        case 2: /* INC: op <- op + 1 */
-            operand = inc(operand);
-            break;
-        case 3: /* DEC: op <- op - 1 */
-            operand = dec(operand);
-            break;
-        case 4: /* NEG: op <- -op */
-            operand = neg(operand);
-            break;
-        case 5: /* TST: op <- op */
-            operand = tst(operand);
-            break;
-        case 6: /* ROR: op <- SHR(c & op) */
-            operand = ror(operand);
-            break;
-        case 7: /* ROL: op <- SHL(op & c) */
-            operand = rol(operand);
-            break;
-        case 8: /* ASR: op <- SHR(msb & op) */
-            operand = asr(operand);
-            break;
-        case 9: /* ASL: op <- SHL(op & 0) */
-            operand = asl(operand);
-            break;
-        case 10: /* ADC: op <- op + c */
-            operand = adc(operand);
-            break;
-        case 11: /* SBC: op <- op - c */
-            operand = sbc(operand);
-            break;
-        default:
-            System.err.println("Operação inválida");
+            case 0: /* CLR: op <- 0 */
+                operand = clr(operand);
+                break;
+            case 1: /* NOT: op <- NOT(op) */
+                operand = not(operand);
+                break;
+            case 2: /* INC: op <- op + 1 */
+                operand = inc(operand);
+                break;
+            case 3: /* DEC: op <- op - 1 */
+                operand = dec(operand);
+                break;
+            case 4: /* NEG: op <- -op */
+                operand = neg(operand);
+                break;
+            case 5: /* TST: op <- op */
+                tst(operand);
+                break;
+            case 6: /* ROR: op <- SHR(c & op) */
+                operand = ror(operand);
+                break;
+            case 7: /* ROL: op <- SHL(op & c) */
+                operand = rol(operand);
+                break;
+            case 8: /* ASR: op <- SHR(msb & op) */
+                operand = asr(operand);
+                break;
+            case 9: /* ASL: op <- SHL(op & 0) */
+                operand = asl(operand);
+                break;
+            case 10: /* ADC: op <- op + c */
+                operand = adc(operand);
+                break;
+            case 11: /* SBC: op <- op - c */
+                operand = sbc(operand);
+                break;
+            default:
+                System.err.println("Operação inválida");
         }
         return operand;
     }
@@ -248,34 +247,34 @@ public class ALU {
     public short executeInstruction(int code, short src, short dst) {
         short result = 0;
         switch (code) {
-        case 1: /* mov */
-            result = mov(src, dst);
-            break;
-        case 2: /* add */
-            result = add(src, dst);
-            break;
-        case 3: /* sub */
-            result = sub(src, dst);
-            break;
-        case 4: /* cmp */
-            cmp(src, dst);
-            break;
-        case 5: /* and */
-            result = and(src, dst);
-            break;
-        case 6: /* or */
-            result = or(src, dst);
-            break;
-        default:
-            // TODO: Avisar sobre operação inválida
-            System.err.println("Operação inválida");
+            case 1: /* mov */
+                result = mov(src, dst);
+                break;
+            case 2: /* add */
+                result = add(src, dst);
+                break;
+            case 3: /* sub */
+                result = sub(src, dst);
+                break;
+            case 4: /* cmp */
+                cmp(src, dst);
+                break;
+            case 5: /* and */
+                result = and(src, dst);
+                break;
+            case 6: /* or */
+                result = or(src, dst);
+                break;
+            default:
+                // TODO: Avisar sobre operação inválida
+                System.err.println("Operação inválida");
         }
         return result;
     }
 
     /**
      * Envia o valor de dst para src N = t Z = t V = 0 C = -
-     * 
+     *
      * @param src
      * @param dst
      * @return src
@@ -289,9 +288,9 @@ public class ALU {
 
     /**
      * Soma dst + src
-     * 
+     * <p>
      * N = t, Z = t, V = t, C = t
-     * 
+     *
      * @param src
      * @param dst
      * @return dst + src
@@ -307,9 +306,9 @@ public class ALU {
 
     /**
      * Subtrai dst - src
-     * 
+     * <p>
      * N = t, Z = t, V = t, C = not(t)
-     * 
+     *
      * @param src
      * @param dst
      * @return dst - src;
@@ -325,9 +324,9 @@ public class ALU {
 
     /**
      * Compara src - dst
-     * 
+     * <p>
      * N = t, Z = t, V = t, C = not(t)
-     * 
+     *
      * @param src
      * @param dst
      */
@@ -341,9 +340,9 @@ public class ALU {
 
     /**
      * Realiza AND entre os bits de src e dst.
-     * 
+     * <p>
      * N = t, Z = t, V = 0, C = -
-     * 
+     *
      * @param src
      * @param dst
      * @return dst & src
@@ -358,9 +357,9 @@ public class ALU {
 
     /**
      * Realiza OR entre os bits de src e dst.
-     * 
+     * <p>
      * N = t, Z = t, V = 0, C = -
-     * 
+     *
      * @param src
      * @param dst
      * @return dst | src

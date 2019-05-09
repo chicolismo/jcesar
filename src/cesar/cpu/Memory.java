@@ -1,8 +1,8 @@
 package cesar.cpu;
 
-import java.util.Arrays;
-
 import cesar.util.Shorts;
+
+import java.util.Arrays;
 
 public class Memory {
     private static final int MEMORY_SIZE = 1 << 16;
@@ -15,9 +15,9 @@ public class Memory {
     private long bytesWritten;
 
     public Memory(CPU cpu) {
-        this.cpu          = cpu;
-        this.data         = new byte[MEMORY_SIZE];
-        this.bytesRead    = 0;
+        this.cpu = cpu;
+        this.data = new byte[MEMORY_SIZE];
+        this.bytesRead = 0;
         this.bytesWritten = 0;
     }
 
@@ -49,8 +49,7 @@ public class Memory {
         if (isDisplayAddress(address)) {
             msb = (byte) 0;
             lsb = readByte(address);
-        }
-        else {
+        } else {
             msb = readByte(address);
             lsb = readByte((short) (address + 1));
         }
@@ -72,8 +71,7 @@ public class Memory {
             // Se estivermos escrevendo uma palavra num endereço que pertence ao display,
             // apenas o byte menos significativo será escrito no endereço fornecido.
             writeByte(address, lsb);
-        }
-        else {
+        } else {
             writeByte(address, msb);
             writeByte((short) (address + 1), lsb);
         }

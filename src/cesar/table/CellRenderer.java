@@ -1,10 +1,10 @@
 package cesar.table;
 
-import javax.swing.JLabel;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import cesar.util.Bytes;
 import cesar.util.Shorts;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public final class CellRenderer {
     private CellRenderer() {

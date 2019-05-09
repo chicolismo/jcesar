@@ -32,12 +32,11 @@ public abstract class Table extends JTable {
 
         setDoubleBuffered(true);
         setColumnSelectionAllowed(false);
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JTableHeader header = getTableHeader();
         header.setDefaultRenderer(new CellRenderer.CenteredTableCellRenderer());
         header.setReorderingAllowed(false);
-
-        getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setFont(new Font("monospaced", Font.PLAIN, 12));
     }
@@ -83,19 +82,29 @@ public abstract class Table extends JTable {
         return isDecimal;
     }
 
-    public void scrollToRow(int rowNumber) {
+    public void scrollToRow(int rowNumber, boolean showOnTop) {
         int rowHeight = getRowHeight();
-        int parentHeight = getParent().getHeight();
-        Rectangle rect = new Rectangle(0, (rowNumber - 1) * rowHeight + parentHeight, getWidth(), rowHeight);
+        Rectangle rect;
+        if (showOnTop) {
+            int parentHeight = getParent().getHeight();
+            rect = new Rectangle(0, (rowNumber - 1) * rowHeight + parentHeight, getWidth(), rowHeight);
+        }
+        else {
+            rect = new Rectangle(0, rowNumber * rowHeight, getWidth(), rowHeight);
+        }
         scrollRectToVisible(rect);
+    }
+
+    public void scrollToRow(int rowNumber) {
+        scrollToRow(rowNumber, true);
     }
 
     @Override
     public abstract Class<?> getColumnClass(int col);
 
-    public abstract String getAddressAtRow(int row);
+    public abstract short getAddressAtRow(int row);
 
-    public abstract String getValueAtRow(int row);
+    public abstract byte getValueAtRow(int row);
 
     public void setValueAtAndUpdate(Object value, int row, int col) {
         ((TableModel) getModel()).setValueAtAndUpdate(value, row, col);

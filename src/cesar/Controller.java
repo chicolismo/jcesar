@@ -25,6 +25,7 @@ import cesar.panel.RegisterPanel;
 import cesar.panel.SidePanel;
 import cesar.table.DataTable;
 import cesar.table.ProgramTable;
+import cesar.util.Shorts;
 
 public class Controller {
     private boolean isRunning;
@@ -64,6 +65,7 @@ public class Controller {
         this.cpu.setConditionsPanel(this.mainPanel.getConditionsPanel());
 
         initMenuBarEvents();
+        initSidePanelsEvents();
         initButtonEvents();
         initRegisterPanelsEvents();
     }
@@ -172,7 +174,7 @@ public class Controller {
             }
         });
 
-        final ProgramTable programTable = (ProgramTable) programPanel.getTable();
+        final ProgramTable table = (ProgramTable) programPanel.getTable();
         btnNext.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -181,7 +183,7 @@ public class Controller {
                     try {
                         cpu.executeNextInstruction();
                         short address = cpu.getPC();
-                        programTable.setProgramCounterRow(address);
+                        table.setProgramCounterRow(Shorts.toUnsignedInt(address));
                     }
                     catch (CPUException e) {
                         e.printStackTrace();
@@ -223,6 +225,28 @@ public class Controller {
                     // Desliga a flag e consequentemente termina a thread que executa o programa
                     // automaticamente.
                     setRunning(false);
+                    short address = cpu.getPC();
+                    table.setProgramCounterRow(Shorts.toUnsignedInt(address));
+                }
+            }
+        });
+    }
+
+    private void initSidePanelsEvents() {
+        final ProgramTable table = (ProgramTable) programPanel.getTable();
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                // Se der um clique duplo em alguma linha da tabela de programa,
+                // a linha clicada passa a indicar o PC.
+                if (event.getClickCount() == 2) {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow != -1) {
+                        cpu.setPC((short) (0xFFFF & selectedRow));
+                        cpu.updateRegisterDisplays();
+                        table.setProgramCounterRow(selectedRow);
+                    }
                 }
             }
         });
@@ -238,6 +262,7 @@ public class Controller {
     private void addEventsToRegisterPanel(final RegisterPanel panel, final int index) {
         final String decMessage = String.format("Digite um valor decimal para %s", panel.getTitle());
         final String hexMessage = String.format("Digite um valor hexadecimal para %s", panel.getTitle());
+        final ProgramTable table = (ProgramTable) programPanel.getTable();
 
         panel.addMouseListener(new MouseAdapter() {
             @Override
@@ -252,6 +277,8 @@ public class Controller {
                             int value = 0xFFFF & Integer.parseInt(newValue, isDecimal ? 10 : 16);
                             panel.setValue(value);
                             cpu.setRegister(index, (short) value);
+                            short address = cpu.getPC();
+                            table.setProgramCounterRow(Shorts.toUnsignedInt(address));
                         }
                         catch (NumberFormatException e) {
                             // e.printStackTrace();

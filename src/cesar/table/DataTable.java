@@ -46,13 +46,13 @@ public class DataTable extends Table {
     }
 
     @Override
-    public String getAddressAtRow(int row) {
-        return String.valueOf(getValueAt(row, 0));
+    public short getAddressAtRow(int row) {
+        return (short) getValueAt(row, 0);
     }
 
     @Override
-    public String getValueAtRow(int row) {
-        return String.valueOf(getValueAt(row, 1));
+    public byte getValueAtRow(int row) {
+        return (byte) getValueAt(row, 1);
     }
 
     private static class DataTableModel extends Table.TableModel {

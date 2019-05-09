@@ -1,26 +1,30 @@
 package cesar;
 
-import cesar.panel.DisplayPanel;
-import cesar.panel.MainPanel;
-import cesar.panel.SidePanel;
-import cesar.table.DataTable;
-import cesar.table.ProgramTable;
-import cesar.table.Table;
-
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+
+import cesar.panel.DisplayPanel;
+import cesar.panel.MainPanel;
+import cesar.panel.RegisterPanel;
+import cesar.panel.SidePanel;
+import cesar.table.DataTable;
+import cesar.table.ProgramTable;
+import cesar.table.Table;
 
 class Window extends JFrame {
     private static final long serialVersionUID = 7470189528132411359L;
@@ -33,6 +37,7 @@ class Window extends JFrame {
     private SidePanel programPanel;
     private SidePanel dataPanel;
     private DisplayPanel displayPanel;
+    private MainPanel mainPanel;
 
     @SuppressWarnings("unused")
     private Controller controller;
@@ -43,11 +48,14 @@ class Window extends JFrame {
         setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 
         JPanel contentPane = new JPanel(true);
-        contentPane.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
+        Border inner = new CompoundBorder(new BevelBorder(BevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));
+        Border border = new CompoundBorder(new EmptyBorder(2, 2, 2, 2), inner);
+        contentPane.setBorder(border);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setContentPane(contentPane);
 
         MainPanel mainPanel = new MainPanel();
+        this.mainPanel = mainPanel;
         contentPane.add(mainPanel);
 
         SidePanel programPanel = createSidePanel("Programa", new ProgramTable());
@@ -73,7 +81,7 @@ class Window extends JFrame {
         programPanel.setSize(350, 500);
         dataPanel.setSize(160, 500);
         dataPanel.getTable().scrollToRow(1024);
-        setResizable(false);
+//        setResizable(false);
     }
 
     private SidePanel createSidePanel(String title, Table table) {
@@ -102,6 +110,18 @@ class Window extends JFrame {
             @Override
             public void componentMoved(ComponentEvent event) {
                 updatePositions();
+            }
+        });
+
+        addMouseMotionListener(new MouseAdapter() {
+            private RegisterPanel[] registers = Window.this.mainPanel.getRegisters();
+
+            @Override
+            public void mouseMoved(MouseEvent event) {
+                Point point = event.getPoint();
+                displayPanel.setValue(point.toString());
+                registers[0].setValue(point.x);
+                registers[1].setValue(point.y);
             }
         });
     }

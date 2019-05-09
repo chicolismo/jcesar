@@ -1,5 +1,6 @@
 package cesar.panel;
 
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,10 +23,11 @@ public class ButtonPanel extends JPanel {
 
     private static ImageIcon runIcon;
     private static ImageIcon nextIcon;
+
     static {
         try {
-            runIcon  = new ImageIcon(ImageIO.read(ButtonPanel.class.getResource("../images/icons/config.bmp")));
-            nextIcon = new ImageIcon(ImageIO.read(ButtonPanel.class.getResource("../images/icons/tools.bmp")));
+            runIcon  = new ImageIcon(ImageIO.read(ButtonPanel.class.getResource("/cesar/images/icons/config.bmp")));
+            nextIcon = new ImageIcon(ImageIO.read(ButtonPanel.class.getResource("/cesar/images/icons/tools.bmp")));
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -57,12 +59,14 @@ public class ButtonPanel extends JPanel {
         btnRun.putClientProperty("JButton.buttonType", "square");
         btnRun.setMargin(new Insets(2, 2, 2, 2));
         btnRun.setIcon(runIcon);
+        btnRun.setSize(new Dimension(16, 16));
         btnRun.setFocusPainted(false);
 
         btnNext = new JButton();
         btnNext.putClientProperty("JButton.buttonType", "square");
         btnNext.setMargin(new Insets(2, 2, 2, 2));
         btnNext.setIcon(nextIcon);
+        btnNext.setSize(new Dimension(16, 16));
         btnNext.setFocusPainted(false);
 
         btnDecimal.addActionListener(new ActionListener() {

@@ -1,7 +1,11 @@
 package cesar.panel;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 
 public class MainPanel extends JPanel {
     private static final long serialVersionUID = -8181221815362621489L;
@@ -14,7 +18,7 @@ public class MainPanel extends JPanel {
     public MainPanel() {
         super(true);
         JPanel registerPanel = new JPanel(true);
-        GridLayout grid = new GridLayout(3, 3, 5, 5);
+        GridLayout grid = new GridLayout(3, 3, 0, 0);
         registerPanel.setLayout(grid);
 
         registers    = new RegisterPanel[8];
@@ -51,7 +55,6 @@ public class MainPanel extends JPanel {
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor     = GridBagConstraints.NORTHWEST;
-        // c.insets = new Insets(0, 0, 0, 5);
         c.gridheight = 2;
         c.gridx      = 0;
         c.gridy      = 0;
@@ -59,7 +62,6 @@ public class MainPanel extends JPanel {
 
         c        = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTHEAST;
-        // c.insets = new Insets(0, 0, 5, 0);
         c.gridx  = 1;
         c.gridy  = 0;
         middlePanel.add(conditionsPanel, c);
