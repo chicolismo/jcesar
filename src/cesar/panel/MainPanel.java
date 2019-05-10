@@ -1,82 +1,70 @@
 package cesar.panel;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class MainPanel extends JPanel {
     private static final long serialVersionUID = -8181221815362621489L;
 
-    private RegisterPanel[] registers;
-    private ExecutionPanel executionPanel;
-    private ConditionsPanel conditionsPanel;
-    private ButtonPanel buttonPanel;
+    private final JPanel registersPanel;
+    private final RegisterPanel[] registers;
+    private final ExecutionPanel executionPanel;
+    private final ButtonPanel buttonPanel;
+    private final ConditionsPanel conditionsPanel;
 
     public MainPanel() {
         super(true);
-        JPanel registerPanel = new JPanel(true);
-        GridLayout grid = new GridLayout(3, 3, 0, 0);
-        registerPanel.setLayout(grid);
+        RegisterPanel r0 = new RegisterPanel("R0:");
+        RegisterPanel r1 = new RegisterPanel("R1:");
+        RegisterPanel r2 = new RegisterPanel("R2:");
+        RegisterPanel r3 = new RegisterPanel("R3:");
+        RegisterPanel r4 = new RegisterPanel("R4:");
+        RegisterPanel r5 = new RegisterPanel("R5:");
+        RegisterPanel r6 = new RegisterPanel("R6 (SP):");
+        RegisterPanel r7 = new RegisterPanel("R7 (PC):");
+        registers      = new RegisterPanel[] { r0, r1, r2, r3, r4, r5, r6, r7 };
 
-        registers    = new RegisterPanel[8];
-        registers[0] = new RegisterPanel("R0:");
-        registers[1] = new RegisterPanel("R1:");
-        registers[2] = new RegisterPanel("R2:");
-        registers[3] = new RegisterPanel("R3:");
-        registers[4] = new RegisterPanel("R4:");
-        registers[5] = new RegisterPanel("R5:");
-        registers[6] = new RegisterPanel("R6 (SP):");
-        registers[7] = new RegisterPanel("R7 (PC):");
+        registersPanel = new JPanel(true);
+        registersPanel.setBounds(0, 0, 308, 202);
+        registersPanel.setLayout(new GridLayout(3, 3, 4, 4));
+        registersPanel.add(r0);
+        registersPanel.add(r1);
+        registersPanel.add(r2);
+        registersPanel.add(r3);
+        registersPanel.add(r4);
+        registersPanel.add(r5);
+        registersPanel.add(r6);
+        JPanel panel = new JPanel();
+        registersPanel.add(panel);
+        registersPanel.add(r7);
 
-        registerPanel.add(registers[0]);
-        registerPanel.add(registers[1]);
-        registerPanel.add(registers[2]);
-        registerPanel.add(registers[3]);
-        registerPanel.add(registers[4]);
-        registerPanel.add(registers[5]);
-        registerPanel.add(registers[6]);
-        registerPanel.add(new JPanel());
-        registerPanel.add(registers[7]);
+        registersPanel.setPreferredSize(registersPanel.getPreferredSize());
 
-        executionPanel  = new ExecutionPanel();
+        executionPanel = new ExecutionPanel();
+        executionPanel.setBounds(0, 204, 171, 81);
+        executionPanel.setPreferredSize(executionPanel.getPreferredSize());
+
         conditionsPanel = new ConditionsPanel();
+        conditionsPanel.setBounds(171, 204, 137, 41);
+        conditionsPanel.setPreferredSize(conditionsPanel.getPreferredSize());
 
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths  = new int[] { 0, 0 };
-        gridBagLayout.rowHeights    = new int[] { 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 0.0, 0.0 };
-        gridBagLayout.rowWeights    = new double[] { 0.0, 0.0 };
+        buttonPanel = new ButtonPanel();
+        buttonPanel.setBounds(171, 250, 137, 35);
+        buttonPanel.setPreferredSize(buttonPanel.getPreferredSize());
+        setLayout(null);
 
-        JPanel middlePanel = new JPanel(true);
-        middlePanel.setLayout(gridBagLayout);
+        add(registersPanel);
+        add(executionPanel);
+        add(conditionsPanel);
+        add(buttonPanel);
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor     = GridBagConstraints.NORTHWEST;
-        c.gridheight = 2;
-        c.gridx      = 0;
-        c.gridy      = 0;
-        middlePanel.add(executionPanel, c);
-
-        c        = new GridBagConstraints();
-        c.anchor = GridBagConstraints.NORTHEAST;
-        c.gridx  = 1;
-        c.gridy  = 0;
-        middlePanel.add(conditionsPanel, c);
-
-        this.buttonPanel = new ButtonPanel();
-        c                = new GridBagConstraints();
-        c.fill           = GridBagConstraints.HORIZONTAL;
-        c.anchor         = GridBagConstraints.SOUTH;
-        c.gridx          = 1;
-        c.gridy          = 1;
-        middlePanel.add(this.buttonPanel, c);
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(registerPanel);
-        this.add(middlePanel);
+        Dimension size = new Dimension(308, 204 + 81);
+        setPreferredSize(size);
+        setSize(size);
+        setMinimumSize(size);
+        setMaximumSize(size);
     }
 
     public ExecutionPanel getExecutionPanel() {

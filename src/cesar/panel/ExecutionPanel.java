@@ -44,14 +44,14 @@ public class ExecutionPanel extends JPanel {
 
         c        = new GridBagConstraints();
         c.fill   = GridBagConstraints.BOTH;
-        c.insets = new Insets(0, 0, 5, 5);
+        c.insets = new Insets(0, 0, 0, 5);
         c.gridx  = 0;
         c.gridy  = 0;
         add(accessLabel, c);
 
         c        = new GridBagConstraints();
         c.fill   = GridBagConstraints.BOTH;
-        c.insets = new Insets(0, 0, 5, 0);
+        c.insets = new Insets(0, 0, 0, 0);
         c.gridx  = 1;
         c.gridy  = 0;
         add(accessDisplay, c);

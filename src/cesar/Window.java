@@ -70,8 +70,9 @@ class Window extends JFrame {
         Controller controller = new Controller(this, mainPanel, programPanel, dataPanel, displayPanel, menuBar);
         this.controller = controller;
         initEvents();
+        setPreferredSize(getPreferredSize());
         pack();
-        setResizable(false);
+//        setResizable(false);
         center();
         updatePositions();
         setVisible(true);

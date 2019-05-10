@@ -2,8 +2,8 @@ package cesar.table;
 
 import java.awt.Font;
 import java.awt.Rectangle;
-import java.awt.SystemColor;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
@@ -15,6 +15,7 @@ public abstract class Table extends JTable {
     private static final long serialVersionUID = 5510916208167787328L;
 
     private boolean isDecimal;
+    private final TableCellRenderer bigCenteredRenderer;
     private final TableCellRenderer centeredRenderer;
     private final TableCellRenderer hexadecimalByteRenderer;
     private final TableCellRenderer decimalByteRenderer;
@@ -24,6 +25,7 @@ public abstract class Table extends JTable {
 
     protected Table() {
         defaultRenderer          = new DefaultTableCellRenderer();
+        bigCenteredRenderer      = new CellRenderer.BigCenteredTableCellRenderer();
         centeredRenderer         = new CellRenderer.CenteredTableCellRenderer();
         decimalByteRenderer      = new CellRenderer.DecimalByteRenderer();
         hexadecimalByteRenderer  = new CellRenderer.HexadecimalByteRenderer();
@@ -35,16 +37,14 @@ public abstract class Table extends JTable {
         setColumnSelectionAllowed(false);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-
         JTableHeader header = getTableHeader();
-        DefaultTableCellRenderer renderer = new CellRenderer.CenteredTableCellRenderer();
-        renderer.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
-        // renderer.setBackground(SystemColor.window);
-        renderer.setBackground(SystemColor.control);
-        header.setDefaultRenderer(renderer);
+        Font headerFont = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
+        header.setFont(headerFont);
+        DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) header.getDefaultRenderer();
+        renderer.setHorizontalAlignment(JLabel.CENTER);
         header.setReorderingAllowed(false);
 
+        setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
     }
 
     @Override
@@ -78,6 +78,10 @@ public abstract class Table extends JTable {
 
     protected TableCellRenderer getHexadecimalShortRenderer() {
         return hexadecimalShortRenderer;
+    }
+
+    protected TableCellRenderer getBigCenteredRenderer() {
+        return bigCenteredRenderer;
     }
 
     protected TableCellRenderer getCenteredRenderer() {

@@ -1,13 +1,25 @@
 package cesar.table;
 
+import java.awt.Font;
+
+import javax.swing.JLabel;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import cesar.util.Bytes;
 import cesar.util.Shorts;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-
 public final class CellRenderer {
     private CellRenderer() {
+    }
+
+    protected static class BigCenteredTableCellRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 5810811798031094957L;
+
+        public BigCenteredTableCellRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.CENTER);
+            setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
+        }
     }
 
     protected static class CenteredTableCellRenderer extends DefaultTableCellRenderer {

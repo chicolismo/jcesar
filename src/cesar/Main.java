@@ -22,6 +22,8 @@ public class Main {
             e.printStackTrace();
         }
 
+//        UIManager.put("TableHeader.font", new Font(Font.SANS_SERIF, Font.BOLD, 12));
+
         // Se quisermos colocar o menu no local correto no macOS.
 //        if (System.getProperty("os.name").contains("Mac")) {
 //            System.setProperty("apple.laf.useScreenMenuBar", "true");
