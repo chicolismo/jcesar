@@ -1,13 +1,9 @@
 package cesar.panel;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 import cesar.display.LedDisplay;
 
@@ -80,37 +76,6 @@ public class ConditionsPanel extends JPanel {
     }
 
     private static JPanel wrap(LedDisplay display, String title) {
-        JPanel panel = new JPanel(true);
-        panel.setLayout(new GridBagLayout());
-        panel.add(display);
-        Dimension size;
-        size = panel.getPreferredSize();
-        panel.setSize(size);
-        panel.setPreferredSize(size);
-        panel.setMaximumSize(size);
-        panel.setMinimumSize(size);
-        JPanel outerPanel = new JPanel(true);
-        outerPanel.setBorder(getBorder(title));
-        outerPanel.add(panel);
-        size = outerPanel.getPreferredSize();
-        outerPanel.setSize(size);
-        outerPanel.setPreferredSize(size);
-        outerPanel.setMaximumSize(size);
-        outerPanel.setMinimumSize(size);
-        return outerPanel;
-    }
-
-    private static TitledBorder getBorder(String title) {
-        TitledBorder border = new TitledBorder(title) {
-            private static final long serialVersionUID = 7188130539443375885L;
-
-            @Override
-            public Insets getBorderInsets(Component c) {
-                Insets customInsets = new Insets(12, 2, 4, 2);
-                return customInsets;
-            }
-        };
-        border.setTitleJustification(TitledBorder.CENTER);
-        return border;
+        return LedDisplay.wrap(display, title);
     }
 }

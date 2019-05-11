@@ -38,7 +38,7 @@ class MenuBar extends JMenuBar {
         menuItemExit       = new JMenuItem("Sair", KeyEvent.VK_R);
 
         int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-        // int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+//        int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
         menuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, mask));
         menuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, mask));

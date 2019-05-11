@@ -11,6 +11,7 @@ public class MainPanel extends JPanel {
     private final JPanel registersPanel;
     private final RegisterPanel[] registers;
     private final ExecutionPanel executionPanel;
+    private final InterruptionPanel interruptionPanel;
     private final ButtonPanel buttonPanel;
     private final ConditionsPanel conditionsPanel;
 
@@ -24,10 +25,12 @@ public class MainPanel extends JPanel {
         RegisterPanel r5 = new RegisterPanel("R5:");
         RegisterPanel r6 = new RegisterPanel("R6 (SP):");
         RegisterPanel r7 = new RegisterPanel("R7 (PC):");
-        registers      = new RegisterPanel[] { r0, r1, r2, r3, r4, r5, r6, r7 };
 
-        registersPanel = new JPanel(true);
-        registersPanel.setBounds(0, 0, 308, 202);
+        registers         = new RegisterPanel[] { r0, r1, r2, r3, r4, r5, r6, r7 };
+        registersPanel    = new JPanel(true);
+        interruptionPanel = new InterruptionPanel();
+
+        registersPanel.setBounds(0, 0, 307, 202);
         registersPanel.setLayout(new GridLayout(3, 3, 4, 4));
         registersPanel.add(r0);
         registersPanel.add(r1);
@@ -36,8 +39,7 @@ public class MainPanel extends JPanel {
         registersPanel.add(r4);
         registersPanel.add(r5);
         registersPanel.add(r6);
-        JPanel panel = new JPanel();
-        registersPanel.add(panel);
+        registersPanel.add(interruptionPanel);
         registersPanel.add(r7);
 
         registersPanel.setPreferredSize(registersPanel.getPreferredSize());
@@ -47,11 +49,11 @@ public class MainPanel extends JPanel {
         executionPanel.setPreferredSize(executionPanel.getPreferredSize());
 
         conditionsPanel = new ConditionsPanel();
-        conditionsPanel.setBounds(171, 204, 137, 41);
+        conditionsPanel.setBounds(173, 204, 134, 41);
         conditionsPanel.setPreferredSize(conditionsPanel.getPreferredSize());
 
         buttonPanel = new ButtonPanel();
-        buttonPanel.setBounds(171, 250, 137, 35);
+        buttonPanel.setBounds(173, 250, 134, 35);
         buttonPanel.setPreferredSize(buttonPanel.getPreferredSize());
         setLayout(null);
 
@@ -60,7 +62,7 @@ public class MainPanel extends JPanel {
         add(conditionsPanel);
         add(buttonPanel);
 
-        Dimension size = new Dimension(308, 204 + 81);
+        Dimension size = new Dimension(307, 204 + 81);
         setPreferredSize(size);
         setSize(size);
         setMinimumSize(size);
@@ -73,6 +75,10 @@ public class MainPanel extends JPanel {
 
     public ConditionsPanel getConditionsPanel() {
         return conditionsPanel;
+    }
+
+    public InterruptionPanel getInterruptionPanel() {
+        return interruptionPanel;
     }
 
     public RegisterPanel[] getRegisters() {

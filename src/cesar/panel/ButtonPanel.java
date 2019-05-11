@@ -41,22 +41,18 @@ public class ButtonPanel extends JPanel {
         final ButtonGroup buttonGroup = new ButtonGroup();
 
         btnDecimal = new Buttons.BevelToggleButton("0..9");
-        btnDecimal.setToolTipText("Decimal");
         btnDecimal.setFocusPainted(false);
         buttonGroup.add(btnDecimal);
 
         btnHexadecimal = new Buttons.BevelToggleButton("0..F");
-        btnHexadecimal.setToolTipText("Hexadecimal");
         btnHexadecimal.setFocusPainted(false);
         buttonGroup.add(btnHexadecimal);
 
         btnRun = new Buttons.BevelToggleButton();
-        btnRun.setToolTipText("Rodar");
         btnRun.setIcon(runIcon);
         btnRun.setFocusPainted(false);
 
         btnNext = new Buttons.BevelButton();
-        btnNext.setToolTipText("Passo-a-passo");
         btnNext.setIcon(nextIcon);
         btnNext.setFocusPainted(false);
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));

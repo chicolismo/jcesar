@@ -6,8 +6,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -20,7 +18,6 @@ import javax.swing.border.EmptyBorder;
 
 import cesar.panel.DisplayPanel;
 import cesar.panel.MainPanel;
-import cesar.panel.RegisterPanel;
 import cesar.panel.SidePanel;
 import cesar.table.DataTable;
 import cesar.table.ProgramTable;
@@ -72,16 +69,19 @@ class Window extends JFrame {
         initEvents();
         setPreferredSize(getPreferredSize());
         pack();
-//        setResizable(false);
+        setResizable(false);
         center();
         updatePositions();
         setVisible(true);
+        setFocusable(true);
         this.programPanel.setVisible(true);
         this.dataPanel.setVisible(true);
         this.displayPanel.setVisible(true);
+
         programPanel.setSize(350, 500);
         dataPanel.setSize(160, 500);
         dataPanel.getTable().scrollToRow(1024);
+
     }
 
     private SidePanel createSidePanel(String title, Table table) {
@@ -113,16 +113,16 @@ class Window extends JFrame {
             }
         });
 
-        addMouseMotionListener(new MouseAdapter() {
-            private RegisterPanel[] registers = Window.this.mainPanel.getRegisters();
-
-            @Override
-            public void mouseMoved(MouseEvent event) {
-                Point point = event.getPoint();
-                displayPanel.setValue(point.toString());
-                registers[0].setValue(point.x);
-                registers[1].setValue(point.y);
-            }
-        });
+//        addMouseMotionListener(new MouseAdapter() {
+//            private RegisterPanel[] registers = Window.this.mainPanel.getRegisters();
+//
+//            @Override
+//            public void mouseMoved(MouseEvent event) {
+//                Point point = event.getPoint();
+//                displayPanel.setValue(point.toString());
+//                registers[0].setValue(point.x);
+//                registers[1].setValue(point.y);
+//            }
+//        });
     }
 }

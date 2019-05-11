@@ -30,12 +30,14 @@ public class CPU {
     private final short[] registers;
     private final ConditionRegister conditionRegister;
     private final ALU alu;
+    private boolean isHalted;
 
     public CPU() {
         this.memory            = new Memory(this);
         this.registers         = new short[8];
         this.conditionRegister = new ConditionRegister();
         this.alu               = new ALU(this.conditionRegister);
+        this.isHalted          = false;
     }
 
     public short[] getRegisters() {
@@ -61,23 +63,27 @@ public class CPU {
     /**
      * Incrementa PC = PC + 2
      */
-    public void incrementPC() {
+    void incrementPC() {
         incrementPC(2);
     }
 
-    public void incrementPC(int amount) {
+    void incrementPC(int amount) {
         incrementRegister(7, amount);
     }
 
-    private void incrementRegister(int registerNumber) {
+    void incrementRegister(int registerNumber) {
         incrementRegister(registerNumber, 2);
     }
 
-    private void incrementRegister(int registerNumber, int amount) {
+    void incrementRegister(int registerNumber, int amount) {
         setRegister(registerNumber, (short) (getRegister(registerNumber) + amount));
     }
 
-    private void decrementRegister(int registerNumber) {
+    void decrementRegister(int registerNumber, int amount) {
+        setRegister(registerNumber, (short) (getRegister(registerNumber) - amount));
+    }
+
+    void decrementRegister(int registerNumber) {
         setRegister(registerNumber, (short) (getRegister(registerNumber) - 2));
     }
 
@@ -140,7 +146,9 @@ public class CPU {
         return value;
     }
 
-    public void executeNextInstruction() throws InvalidInstructionException, InvalidOpCodeException {
+    public void executeNextInstruction() throws InvalidInstructionException, InvalidOpCodeException, HaltedException {
+        isHalted = false;
+
         byte firstByte = fetchByte();
 
         // Copia os 4 bits mais significativos
@@ -166,12 +174,22 @@ public class CPU {
             jmp(word);
             break;
         }
-        case 0b0101: /* Instrução de controle de laço (SOB) */
+        case 0b0101: { /* Instrução de controle de laço (SOB) */
+            byte secondByte = fetchByte();
+            short word = Memory.bytesToShort(firstByte, secondByte);
+            sob(word);
             break;
-        case 0b0110: /* Instrução de desvio para sub-rotina (JSR) */
+        }
+        case 0b0110: { /* Instrução de desvio para sub-rotina (JSR) */
+            byte secondByte = fetchByte();
+            short word = Memory.bytesToShort(firstByte, secondByte);
+            jsr(word);
             break;
-        case 0b0111: /* Instrução de retorno de sub-rotina (RTS) */
+        }
+        case 0b0111: { /* Instrução de retorno de sub-rotina (RTS) */
+            rts(firstByte);
             break;
+        }
         case 0b1000: { /* Instruções de 1 operando */
             byte secondByte = fetchByte();
             try {
@@ -202,6 +220,7 @@ public class CPU {
             break;
         }
         case 0b1111: /* Instrução de parada (HLT) */
+            isHalted = true;
             break;
         default: {
             throw InvalidOpCodeException.withOpCode(opCode);
@@ -213,6 +232,10 @@ public class CPU {
         // registradores e códigos de condição. Bem como se as tabelas devem ser
         // alteradas.
         updateRegisterDisplays();
+
+        if (isHalted) {
+            throw new HaltedException();
+        }
     }
 
     private void executeOneOperandInstruction(byte firstByte, byte secondByte) throws InvalidAddressModeException {
@@ -481,6 +504,80 @@ public class CPU {
         }
     }
 
+    private void sob(short instruction) {
+        int registerNumber = (0b0000_0111_0000_0000 & instruction) >> 8;
+        short offset = (short) (0b0000_0000_1111_1111 & instruction);
+
+        decrementRegister(registerNumber, 1);
+        if (getRegister(registerNumber) != 0) {
+            setPC((short) (getPC() - offset));
+        }
+    }
+
+    /**
+     * Os bits rrr da primeira palavra indicam um registrador, enquanto a segunda
+     * palavra é utilizada para calcular o endereço da sub-rotina, de modo idêntico
+     * à instrução de desvio incondicional (JMP). O desvio para a sub-rotina é
+     * realizado conforme a sequência de operações a seguir:
+     * 
+     * <pre>
+     *      temporário  <- endereço da subrotina
+     *      pilha       <- registrador
+     *      registrador <- R7
+     *      R7          <- temporário
+     * </pre>
+     * 
+     * Com isso, o registrador indicado na primeira palavra é colocado na pilha, a
+     * seguir o PC atual é salvo neste registrador e, finalmente, o PC recebe o
+     * enderço da sub-rotina. Noe que, se o registrador for o próprio PC, o efeito
+     * do desvio resume-se a salvar o PC atual na pilha e, então, desviar para a
+     * sub-rotina. Assim como na instrução de JMP, o uso do modo zero para o cálculo
+     * do endereço da sub-rotina é tratado como NOP.
+     */
+    private void jsr(short instruction) {
+        // 0110_xrrr_xxmm_mrrr
+
+        int reg = (0b0000_0111_0000_0000 & instruction) >> 8;
+        int addressMode = (0b0000_0000_0011_1000 & instruction) >> 3;
+        int registerNumber = (0b0000_0000_0000_0111 & instruction);
+        try {
+            // o endereço da sub-rotina é lido no valor temporário
+            short temp = getOperand(addressMode, registerNumber);
+            memory.push(getRegister(reg));
+            setRegister(reg, getPC());
+            setPC(temp);
+        }
+        catch (InvalidAddressModeException e) {
+            // NOP
+        }
+    }
+
+    /**
+     * A instrução de retorno de sub-rotina (RTS) ocupa 1 único byte e tem o formato
+     * 0111_xrrr. O bit x pode ser qualquer valor, e <code>rrr</code> indica o
+     * registrador de retorno. A instrução realiza as seguintes operações
+     * necessárias para desfazer o efeito de uma instrução de desvio para a
+     * sub-rotina:
+     * 
+     * <pre>
+     *      R7          <- registrador
+     *      registrador <- topo da pilha
+     * </pre>
+     * 
+     * Ou seja, o PC é atualizado com o conteúdo do registrador indicado e, a
+     * seguir, este registrador é carregado com o conteúdo do topo da pilha. Se o
+     * registrador for o próprio PC, a instrução resume-se a atualizar o PC com o
+     * conteúdo do topo da pilha.
+     * 
+     * @param instruction
+     */
+    private void rts(byte instruction) {
+        // 0111_xrrr
+        int returnRegister = (0b0000_0111 & instruction);
+        setPC(getRegister(returnRegister));
+        setRegister(returnRegister, memory.pop());
+    }
+
     private short getOperand(int addressMode, int reg) throws InvalidAddressModeException {
         short operand = 0;
         switch (ADDRESS_MODES[addressMode]) {
@@ -586,4 +683,5 @@ public class CPU {
         builder.append(String.format("  N: %d\n  Z: %d\n  V: %d\n  C: %d\n", n, z, v, c));
         return builder.toString();
     }
+
 }
