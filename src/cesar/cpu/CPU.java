@@ -40,6 +40,10 @@ public class CPU {
         this.isHalted          = false;
     }
 
+    public Memory getMemory() {
+        return memory;
+    }
+
     public short[] getRegisters() {
         return registers;
     }

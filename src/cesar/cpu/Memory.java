@@ -37,9 +37,15 @@ public class Memory {
         }
     }
 
-    public byte readByte(short address) {
-        ++bytesRead;
+    public byte readByte(short address, boolean countAccess) {
+        if (countAccess) {
+            ++bytesRead;
+        }
         return data[Shorts.toUnsignedInt(address)];
+    }
+
+    public byte readByte(short address) {
+        return readByte(address, true);
     }
 
     public short readWord(short address) {
@@ -57,11 +63,17 @@ public class Memory {
         return Memory.bytesToShort(msb, lsb);
     }
 
-    public void writeByte(short address, byte value) {
-        ++bytesWritten;
+    public void writeByte(short address, byte value, boolean countAccess) {
+        if (countAccess) {
+            ++bytesWritten;
+        }
         int index = Shorts.toUnsignedInt(address);
         data[index] = value;
         cpu.notifyMemoryChange(index, value);
+    }
+
+    public void writeByte(short address, byte value) {
+        writeByte(address, value, true);
     }
 
     public void writeWord(short address, short value) {

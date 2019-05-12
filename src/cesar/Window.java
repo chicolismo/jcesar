@@ -34,8 +34,8 @@ class Window extends JFrame {
     private SidePanel programPanel;
     private SidePanel dataPanel;
     private DisplayPanel displayPanel;
+    @SuppressWarnings("unused")
     private MainPanel mainPanel;
-
     @SuppressWarnings("unused")
     private Controller controller;
 

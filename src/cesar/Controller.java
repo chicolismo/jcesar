@@ -30,6 +30,7 @@ import cesar.panel.RegisterPanel;
 import cesar.panel.SidePanel;
 import cesar.table.DataTable;
 import cesar.table.ProgramTable;
+import cesar.table.Table;
 import cesar.util.Shorts;
 
 public class Controller {
@@ -78,6 +79,8 @@ public class Controller {
         this.cpu.setRegisterPanels(this.mainPanel.getRegisters());
         this.cpu.setConditionsPanel(this.mainPanel.getConditionsPanel());
 
+        ((ProgramTable) programPanel.getTable()).setProgramCounterRow(0);
+
         ButtonPanel buttons = mainPanel.getButtonPanel();
         this.btnDecimal     = buttons.getBtnDecimal();
         this.btnHexadecimal = buttons.getBtnHexadecimal();
@@ -99,27 +102,6 @@ public class Controller {
 
     private synchronized void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
-    }
-
-
-    private void openFile() {
-        parent.toFront();
-
-        if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            try (FileInputStream inputStream = new FileInputStream(file)) {
-                int size = (int) file.length();
-                byte[] buffer = new byte[size];
-                // inputStream.readNBytes(buffer, 0, size);
-                inputStream.read(buffer, 0, size);
-                cpu.setBytes(buffer);
-            }
-            catch (IOException e) {
-                String message = String.format("Erro ao tentar ler o arquivo %s.", file.getPath());
-                JOptionPane.showMessageDialog(parent, message, "Erro de leitura", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
-            }
-        }
     }
 
 
@@ -279,6 +261,26 @@ public class Controller {
                 }
             }
         });
+
+        for (final SidePanel panel : new SidePanel[] { programPanel, dataPanel }) {
+            panel.getTextField().addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    String addressText = panel.getLabel().getText();
+                    String valueText = panel.getTextField().getText();
+                    try {
+                        short address = (short) Integer.parseInt(addressText, isDecimal ? 10 : 16);
+                        byte value = (byte) Integer.parseInt(valueText, isDecimal ? 10 : 16);
+                        cpu.getMemory().writeByte(address, value, false);
+                    }
+                    catch (NumberFormatException e) {
+                        // NOP
+                    }
+                    Table table = panel.getTable();
+                    table.selectRow(table.getSelectedRow() + 1);
+                }
+            });
+        }
     }
 
 
@@ -333,33 +335,15 @@ public class Controller {
     }
 
 
-    private void saveFile() {
-    }
-
-
-    private void saveFileAs() {
-
-    }
-
-
-    private void exit() {
-        parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
-    }
-
-
-    private void showAbout() {
-        String version = System.getProperty("java.version");
-        String message = String.format("Versão do Java: %s", version);
-        JOptionPane.showMessageDialog(parent, message);
-    }
-
     private synchronized boolean isWaitingKey() {
         return waitingKey;
     }
 
+
     private synchronized void setWaitingKey(boolean isWaitingKey) {
         this.waitingKey = isWaitingKey;
     }
+
 
     private void initKeyboardEvents() {
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -390,5 +374,47 @@ public class Controller {
                 return false;
             }
         });
+    }
+
+
+    private void openFile() {
+        parent.toFront();
+
+        if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (FileInputStream inputStream = new FileInputStream(file)) {
+                int size = (int) file.length();
+                byte[] buffer = new byte[size];
+                // inputStream.readNBytes(buffer, 0, size);
+                inputStream.read(buffer, 0, size);
+                cpu.setBytes(buffer);
+            }
+            catch (IOException e) {
+                String message = String.format("Erro ao tentar ler o arquivo %s.", file.getPath());
+                JOptionPane.showMessageDialog(parent, message, "Erro de leitura", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private void saveFile() {
+    }
+
+
+    private void saveFileAs() {
+
+    }
+
+
+    private void exit() {
+        parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
+    }
+
+
+    private void showAbout() {
+        String version = System.getProperty("java.version");
+        String message = String.format("Versão do Java: %s", version);
+        JOptionPane.showMessageDialog(parent, message);
     }
 }

@@ -79,7 +79,7 @@ public class ProgramTable extends Table {
         programCounterRow = row;
         setValueAtAndUpdate("", oldRow, 0);
         setValueAtAndUpdate("➔", row, 0);
-        setRowSelectionInterval(row, row);
+        selectRow(row);
         scrollToRow(row, false);
     }
 

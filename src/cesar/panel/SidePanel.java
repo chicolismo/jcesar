@@ -89,15 +89,25 @@ public class SidePanel extends JDialog {
         return table;
     }
 
+    public JTextField getTextField() {
+        return textField;
+    }
+
+    public JLabel getLabel() {
+        return label;
+    }
+
     private void initEvents() {
         ListSelectionModel selectionModel = table.getSelectionModel();
         selectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
-                int rowIndex = event.getLastIndex();
-                addressValue = Shorts.toUnsignedInt(table.getAddressAtRow(rowIndex));
-                datumValue   = Bytes.toUnsignedInt(table.getValueAtRow(rowIndex));
-                updateControls(addressValue, datumValue, true);
+                int rowIndex = table.getSelectedRow();
+                if (rowIndex != -1) {
+                    addressValue = Shorts.toUnsignedInt(table.getAddressAtRow(rowIndex));
+                    datumValue   = Bytes.toUnsignedInt(table.getValueAtRow(rowIndex));
+                    updateControls(addressValue, datumValue, true);
+                }
             }
         });
     }

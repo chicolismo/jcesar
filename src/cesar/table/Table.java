@@ -60,6 +60,17 @@ public abstract class Table extends JTable {
         }
     }
 
+    public void selectRow(int row) {
+        int rowCount = getRowCount();
+
+        if (row >= 0 && row < rowCount) {
+            setRowSelectionInterval(row, row);
+        }
+        else if (rowCount > 0) {
+            setRowSelectionInterval(0, 0);
+        }
+    }
+
     protected TableCellRenderer getDefaultRenderer() {
         return defaultRenderer;
     }
